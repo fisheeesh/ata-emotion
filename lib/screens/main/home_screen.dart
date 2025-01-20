@@ -1,9 +1,12 @@
 import 'package:emotion_check_in_app/screens/onBoard/on_boarding_screen.dart';
+import 'package:emotion_check_in_app/utils/auth/auth_services.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  final GoogleSignInAccount? user;
+  const HomeScreen({super.key, required this.user});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -27,7 +30,7 @@ class _HomeScreenState extends State<HomeScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Column(
+                Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
@@ -38,14 +41,15 @@ class _HomeScreenState extends State<HomeScreen> {
                           fontWeight: FontWeight.bold),
                     ),
                     Text(
-                      "Beyonce",
+                      widget.user!.displayName! ?? 'Users',
                       style: TextStyle(color: Colors.grey, fontSize: 16),
                     ),
                   ],
                 ),
                 OutlinedButton(
-                  onPressed: () {
+                  onPressed: () async{
                     // Handle logout
+                    await AuthServices.logOut();
                     Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => OnBoardingScreen()));
                   },
                   style: OutlinedButton.styleFrom(

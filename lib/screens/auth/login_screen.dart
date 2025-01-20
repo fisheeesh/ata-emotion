@@ -2,6 +2,7 @@ import 'package:emotion_check_in_app/components/buttons/custom_button.dart';
 import 'package:emotion_check_in_app/components/formFields/custom_text_form_field.dart';
 import 'package:emotion_check_in_app/components/buttons/custom_outlined_button.dart';
 import 'package:emotion_check_in_app/screens/main/home_screen.dart';
+import 'package:emotion_check_in_app/utils/auth/auth_services.dart';
 import 'package:emotion_check_in_app/utils/constants/colors.dart';
 import 'package:emotion_check_in_app/utils/constants/image_strings.dart';
 import 'package:emotion_check_in_app/utils/constants/text_strings.dart';
@@ -40,7 +41,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
       try {
         _formKey.currentState!.save();
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomeScreen()));
+        // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomeScreen()));
         debugPrint('Success');
       } catch (e) {
         debugPrint("Login Error: $e");
@@ -52,13 +53,23 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  Future<void> _handleGoogleLogin() async {
+  Future _handleGoogleLogin() async {
     setState(() {
       _isGoogleLoading = true;
     });
 
     try {
+      final user = await AuthServices.login();
 
+      if(user == null){
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Sign-in Failed.')));
+      }
+
+      final auth = await user?.authentication;
+
+      debugPrint('Success: ${user?.displayName}, idToken: ${auth?.accessToken}, accessToken: ${auth?.accessToken}');
+
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomeScreen(user: user)));
       debugPrint('Success');
     } catch (e) {
       debugPrint("Google Login Error: $e");

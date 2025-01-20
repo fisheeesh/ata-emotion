@@ -3,6 +3,7 @@ import 'package:emotion_check_in_app/utils/theme/theme.dart';
 import 'package:flutter/material.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const App());
 }
 
