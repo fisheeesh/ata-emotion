@@ -12,7 +12,7 @@ class EAppTheme {
     fontFamily: 'Lexend',
     brightness: Brightness.light,
     primaryColor: EColors.primary,
-    scaffoldBackgroundColor: EColors.primaryBackground,
+    scaffoldBackgroundColor: EColors.secondary,
     textTheme: ETextTheme.lightTextTheme,
   );
 }

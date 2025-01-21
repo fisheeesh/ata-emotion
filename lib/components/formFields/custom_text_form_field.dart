@@ -31,10 +31,10 @@ class CustomTextFormField extends StatelessWidget {
         labelText: labelText,
         labelStyle: TextStyle(color: EColors.grey),
         focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(ESizes.borderRadiusMd),
+            borderRadius: BorderRadius.circular(ESizes.roundedXs),
             borderSide: BorderSide(color: EColors.grey)),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(ESizes.borderRadiusMd),
+          borderRadius: BorderRadius.circular(ESizes.roundedXs),
         ),
         suffixIcon: suffixIcon,
       ),

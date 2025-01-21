@@ -11,28 +11,25 @@ class ETextTheme {
       textStyle: TextStyle(
         fontSize: ESizes.fontSizeLg,
         fontWeight: FontWeight.w600,
-        color: EColors.textPrimary,
+        color: EColors.dark,
       ),
     ),
     titleLarge: GoogleFonts.lexend(
       textStyle: TextStyle(
         fontSize: ESizes.fontSizeMd,
-        fontWeight: FontWeight.bold,
         color: EColors.white,
       ),
     ),
     titleMedium: GoogleFonts.lexend(
       textStyle: TextStyle(
         fontSize: ESizes.fontSizeMd,
-        fontWeight: FontWeight.normal,
         color: EColors.black,
       ),
     ),
     labelLarge: GoogleFonts.lexend(
       textStyle: TextStyle(
         fontSize: ESizes.fontSizeSm,
-        fontWeight: FontWeight.normal,
-        color: EColors.textSecondary,
+        color: EColors.grey,
       ),
     ),
   );

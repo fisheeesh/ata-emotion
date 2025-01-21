@@ -1,7 +1,12 @@
+import 'package:emotion_check_in_app/provider/auth_provider.dart';
 import 'package:emotion_check_in_app/screens/onBoard/on_boarding_screen.dart';
-import 'package:emotion_check_in_app/utils/auth/auth_services.dart';
+import 'package:emotion_check_in_app/utils/constants/colors.dart';
+import 'package:emotion_check_in_app/utils/constants/sizes.dart';
+import 'package:emotion_check_in_app/utils/constants/text_strings.dart';
+import 'package:emotion_check_in_app/utils/helpers/helper_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -16,12 +21,26 @@ class _HomeScreenState extends State<HomeScreen> {
   DateTime _selectedDay = DateTime.now();
   DateTime _focusedDay = DateTime.now();
 
+  String _getGreetingMessage() {
+    final hour = DateTime.now().hour;
+
+    if (hour >= 5 && hour < 12) {
+      return ETexts.morning;
+    } else if (hour >= 12 && hour < 17) {
+      return ETexts.noon;
+    } else if (hour >= 17 && hour < 21) {
+      return ETexts.evening;
+    } else {
+      return ETexts.night;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7FB),
       body: Padding(
-        padding: const EdgeInsets.only(left: 24.0, right: 24.0, top: 45.0),
+        padding: const EdgeInsets.only(left: ESizes.md, right: ESizes.md, top: ESizes.base),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -34,7 +53,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Good Morning,",
+                      _getGreetingMessage(),
                       style: TextStyle(
                           color: Colors.black,
                           fontSize: 22,
@@ -49,12 +68,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 OutlinedButton(
                   onPressed: () async{
                     // Handle logout
-                    await AuthServices.logOut();
+                    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+                    await authProvider.logout();
                     Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => OnBoardingScreen()));
+                    EHelperFunctions.showSnackBar(context, 'Logout Successfully.');
                   },
                   style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: Colors.red),
-                    foregroundColor: Colors.red,
+                    side: const BorderSide(color: EColors.danger),
+                    foregroundColor: EColors.danger,
                   ),
                   child: const Text(
                     "Log Out",
@@ -68,17 +89,17 @@ class _HomeScreenState extends State<HomeScreen> {
             // Calendar
             Container(
               decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
+                color: EColors.white,
+                borderRadius: BorderRadius.circular(ESizes.roundedSm),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
+                    color: EColors.black.withOpacity(0.1),
                     blurRadius: 10,
                   ),
                 ],
               ),
               child: Padding(
-                padding: const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 16.0),
+                padding: const EdgeInsets.only(left: ESizes.sm, right: ESizes.sm, bottom: ESizes.sm),
                 child: TableCalendar(
                   firstDay: DateTime.utc(2000, 1, 1),
                   lastDay: DateTime.utc(2100, 12, 31),
@@ -97,28 +118,29 @@ class _HomeScreenState extends State<HomeScreen> {
                     titleTextStyle: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
+                      color: EColors.dark
                     ),
                   ),
                   calendarStyle: CalendarStyle(
                     selectedDecoration: BoxDecoration(
-                      color: Colors.green,
+                      color: EColors.lightBlue,
                       shape: BoxShape.circle,
                     ),
                     todayDecoration: BoxDecoration(
-                      color: Colors.green,
+                      color: EColors.onTimeColor,
                       shape: BoxShape.circle,
                     ),
                     weekendDecoration: BoxDecoration(
-                      color: Colors.red,
+                      color: EColors.lateColor,
                       shape: BoxShape.circle,
                     ),
-                    holidayTextStyle: const TextStyle(color: Colors.red),
-                    weekendTextStyle: const TextStyle(color: Colors.white),
+                    holidayTextStyle: const TextStyle(color: EColors.lateColor),
+                    weekendTextStyle: const TextStyle(color: EColors.white),
                     defaultDecoration: BoxDecoration(
-                      color: Colors.green,
+                      color: EColors.onTimeColor,
                       shape: BoxShape.circle,
                     ),
-                    defaultTextStyle: const TextStyle(color: Colors.white),
+                    defaultTextStyle: const TextStyle(color: EColors.white),
                     outsideDaysVisible: false,
                   ),
                 ),
@@ -128,10 +150,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
             // Check In Information
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: ESizes.sm, vertical: 12),
               decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
+                color: EColors.white,
+                borderRadius: BorderRadius.circular(ESizes.roundedSm),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withOpacity(0.1),
@@ -184,12 +206,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   // Handle Check-In logic
                 },
                 child: Container(
-                  width: double.infinity,
-                  height: 55,
+                  width: ESizes.wFull,
+                  height: ESizes.hSm,
                   margin: const EdgeInsets.symmetric(horizontal: 16),
                   decoration: BoxDecoration(
-                    color: Colors.blue,
-                    borderRadius: BorderRadius.circular(12),
+                    color: EColors.primary,
+                    borderRadius: BorderRadius.circular(ESizes.roundedLg),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.blue.withOpacity(0.4),
@@ -202,7 +224,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       "Check In",
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: 18,
+                        fontSize: 24,
                         fontWeight: FontWeight.bold,
                       ),
                     ),

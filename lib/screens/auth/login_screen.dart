@@ -1,14 +1,17 @@
 import 'package:emotion_check_in_app/components/buttons/custom_button.dart';
 import 'package:emotion_check_in_app/components/formFields/custom_text_form_field.dart';
 import 'package:emotion_check_in_app/components/buttons/custom_outlined_button.dart';
+import 'package:emotion_check_in_app/provider/auth_provider.dart';
 import 'package:emotion_check_in_app/screens/main/home_screen.dart';
-import 'package:emotion_check_in_app/utils/auth/auth_services.dart';
 import 'package:emotion_check_in_app/utils/constants/colors.dart';
 import 'package:emotion_check_in_app/utils/constants/image_strings.dart';
 import 'package:emotion_check_in_app/utils/constants/text_strings.dart';
+import 'package:emotion_check_in_app/utils/helpers/helper_functions.dart';
 import 'package:emotion_check_in_app/utils/validator/validator.dart';
 import 'package:flutter/material.dart';
 import 'package:emotion_check_in_app/utils/theme/text_theme.dart';
+import 'package:emotion_check_in_app/utils/constants/sizes.dart';
+import 'package:provider/provider.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -33,15 +36,13 @@ class _LoginScreenState extends State<LoginScreen> {
     _passwordController.dispose();
   }
 
-  void _handleLogin() async {
+  void _handleLogin() {
     if (_formKey.currentState?.validate() ?? false) {
       setState(() {
         _isLoading = true;
       });
-
       try {
         _formKey.currentState!.save();
-        // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomeScreen()));
         debugPrint('Success');
       } catch (e) {
         debugPrint("Login Error: $e");
@@ -53,26 +54,32 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  Future _handleGoogleLogin() async {
+  Future<void> _handleGoogleLogin() async {
     setState(() {
       _isGoogleLoading = true;
     });
 
     try {
-      final user = await AuthServices.login();
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
 
-      if(user == null){
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Sign-in Failed.')));
+      // Perform login and authorization
+      final isAuthorized = await authProvider.loginAndAuthorize();
+
+      if (isAuthorized) {
+        // Navigate to HomeScreen if authorized
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => HomeScreen(user: authProvider.user),
+          ),
+        );
+      } else {
+        // Show error if authorization fails
+        EHelperFunctions.showSnackBar(context, 'Authorization Failed.');
       }
-
-      final auth = await user?.authentication;
-
-      debugPrint('Success: ${user?.displayName}, idToken: ${auth?.accessToken}, accessToken: ${auth?.accessToken}');
-
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomeScreen(user: user)));
-      debugPrint('Success');
     } catch (e) {
       debugPrint("Google Login Error: $e");
+      EHelperFunctions.showSnackBar(context, 'Google Sign-in Failed.');
     } finally {
       setState(() {
         _isGoogleLoading = false;
@@ -90,7 +97,7 @@ class _LoginScreenState extends State<LoginScreen> {
           children: [
             Center(
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                padding: const EdgeInsets.symmetric(horizontal: ESizes.md),
                 width: double.infinity,
                 child: Form(
                   key: _formKey,
@@ -104,7 +111,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           children: [
                             Image.asset(
                               EImages.ataLogo,
-                              height: 50,
+                              height: ESizes.hNormal,
                             ),
                           ],
                         ),
@@ -163,16 +170,16 @@ class _LoginScreenState extends State<LoginScreen> {
 
                         // Login Button
                         CustomButton(
-                          width: double.infinity,
-                          height: 55,
+                          width: ESizes.wFull,
+                          height: ESizes.hNormal,
                           onPressed: _isLoading ? null : _handleLogin,
                           child: _isLoading
                               ? Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               const SizedBox(
-                                width: 20,
-                                height: 20,
+                                width: ESizes.wXs,
+                                height: ESizes.hXs,
                                 child: CircularProgressIndicator(
                                   color: EColors.white,
                                   strokeWidth: 2.0,
@@ -197,14 +204,14 @@ class _LoginScreenState extends State<LoginScreen> {
                         CustomOutlinedButton(
                           width: double.infinity,
                           height: 55,
-                          borderColor: EColors.buttonPrimary,
+                          borderColor: EColors.primary,
                           onPressed: _isGoogleLoading ? null : _handleGoogleLogin,
                           child: _isGoogleLoading
                               ? const SizedBox(
-                            width: 20,
-                            height: 20,
+                            width: ESizes.wXs,
+                            height: ESizes.hXs,
                             child: CircularProgressIndicator(
-                              color: EColors.buttonPrimary,
+                              color: EColors.primary,
                               strokeWidth: 2.0,
                             ),
                           )
@@ -213,7 +220,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             children: [
                               Image.asset(
                                 EImages.googleLogo,
-                                height: 20,
+                                height: ESizes.hXs,
                               ),
                               const SizedBox(width: 10),
                               Text(

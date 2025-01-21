@@ -1,6 +1,8 @@
+import 'package:emotion_check_in_app/provider/auth_provider.dart';
 import 'package:emotion_check_in_app/screens/onBoard/on_boarding_screen.dart';
 import 'package:emotion_check_in_app/utils/theme/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -12,11 +14,16 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: EAppTheme.lightTheme,
-      debugShowCheckedModeBanner: false,
-      home: OnBoardingScreen(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
+      ],
+      child: MaterialApp(
+        title: 'Flutter Demo',
+        theme: EAppTheme.lightTheme,
+        debugShowCheckedModeBanner: false,
+        home: OnBoardingScreen(),
+      ),
     );
   }
 }

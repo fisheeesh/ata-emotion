@@ -42,7 +42,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
         children: [
           // Centered image
           Padding(
-            padding: const EdgeInsets.only(top: 100),
+            padding: const EdgeInsets.only(top: ESizes.xl),
             child: Center(
               child: Image.asset(
                 EImages.phone,
@@ -52,7 +52,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
 
           // Full logo (foreground element)
           Padding(
-            padding: const EdgeInsets.only(top: 100, left: 100, right: 100),
+            padding: const EdgeInsets.only(top: ESizes.xl, left: ESizes.xl, right: ESizes.xl),
             child: Align(
               alignment: Alignment.topCenter,
               child: Image.asset(
@@ -64,10 +64,10 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
           // PageView positioned in the middle
           Padding(
             padding: const EdgeInsets.only(
-                left:75, right: 75, top: 220),
+                left:ESizes.lg, right: ESizes.lg, top: ESizes.xxxl),
             child: SizedBox(
-              height: 500,
-              width: 500,
+              height: ESizes.hLg,
+              width: ESizes.wLg,
               child: PageView(
                 onPageChanged: (index) => {
                   setState(() {
@@ -87,12 +87,12 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
           Align(
             alignment: Alignment.bottomCenter,
             child: Container(
-              height: 270,
-              width: double.infinity,
+              height: ESizes.hMd,
+              width: ESizes.wFull,
               decoration: BoxDecoration(
                 color: EColors.white,
                 borderRadius: BorderRadius.vertical(
-                  top: Radius.circular(ESizes.borderRadiusLg),
+                  top: Radius.circular(ESizes.roundedMd),
                 ),
                 boxShadow: [
                   BoxShadow(
@@ -125,7 +125,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                       AnimatedSwitcher(
                         duration: Duration(milliseconds: 500),
                         child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                          padding: const EdgeInsets.symmetric(horizontal: ESizes.md),
                           child: Text(
                             onLastPage
                                 ? ETexts.onBoardingTitle2
@@ -137,30 +137,27 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                         ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.only(top: ESizes.sm),
-                        child: AnimatedSwitcher(
-                          duration: Duration(milliseconds: 500),
-                          child: Text(
-                            onLastPage
-                                ? ETexts.onBoardingSubTitle2
-                                : ETexts.onBoardingSubTitle1,
-                            key: ValueKey<bool>(onLastPage),
-                            style: ETextTheme.lightTextTheme.labelLarge,
-                          ),
+                        padding: const EdgeInsets.only(top: ESizes.sm, bottom: ESizes.sm),
+                        child: Text(
+                          onLastPage
+                              ? ETexts.onBoardingSubTitle2
+                              : ETexts.onBoardingSubTitle1,
+                          key: ValueKey<bool>(onLastPage),
+                          style: ETextTheme.lightTextTheme.labelLarge,
                         ),
                       ),
                     ],
                   ),
                   Padding(
                     padding:
-                    const EdgeInsets.symmetric(horizontal: ESizes.largeMd),
+                    const EdgeInsets.symmetric(horizontal: ESizes.md),
                     child: onLastPage
                         ? Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         SizedBox(
-                          width: 50,
-                          height: 50,
+                          width: ESizes.wNormal,
+                          height: ESizes.hNormal,
                           child: TextButton(
                             onPressed: () {
                               _pageController.previousPage(
@@ -168,24 +165,24 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                                   curve: Curves.easeInOut);
                             },
                             style: TextButton.styleFrom(
-                              backgroundColor: EColors.buttonSecondary,
+                              backgroundColor: EColors.lightBlue,
                               shape: CircleBorder(),
                             ),
                             child: Padding(
                               padding:
-                              const EdgeInsets.only(left: ESizes.ssm),
+                              const EdgeInsets.only(left: ESizes.xs),
                               child: Icon(
                                 Icons.arrow_back_ios,
                                 size: ESizes.iconMd,
-                                color: EColors.textSecondary,
+                                color: EColors.lightGary,
                               ),
                             ),
                           ),
                         ),
                         const SizedBox(width: 10),
                         CustomButton(
-                          width: 295,
-                          height: 55,
+                          width: 298,
+                          height: ESizes.hNormal,
                           child: Text(
                             ETexts.logIn,
                             style: ETextTheme.lightTextTheme.titleLarge,
@@ -201,10 +198,10 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                       ],
                     )
                         : CustomButton(
-                        width: double.infinity,
-                        height: 55,
+                        width: ESizes.wFull,
+                        height: ESizes.hNormal,
                         child: Text(
-                          ETexts.getStarted,
+                          ETexts.next,
                           style: ETextTheme.lightTextTheme.titleLarge,
                         ),
                         onPressed: () {
