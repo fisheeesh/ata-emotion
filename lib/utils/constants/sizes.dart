@@ -14,11 +14,6 @@ class ESizes {
   static const double iconMd = 18.0;
   static const double iconLg = 24.0;
 
-  // Font sizes
-  static const double fontSizeSm = 16.0;
-  static const double fontSizeMd = 18.0;
-  static const double fontSizeLg = 30.0;
-
   // Width & Height
   static const double wFull = double.infinity;
   static const double wXs = 20;
@@ -28,7 +23,7 @@ class ESizes {
 
   static const double hXs = 20;
   static const double hNormal = 55;
-  static const double hSm = 100;
+  static const double hSm = 89;
   static const double hMd = 270;
   static const double hLg = 500;
 

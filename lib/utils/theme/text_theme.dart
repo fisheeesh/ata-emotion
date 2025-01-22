@@ -9,26 +9,26 @@ class ETextTheme {
   static TextTheme lightTextTheme = TextTheme(
     headlineLarge: GoogleFonts.lexend(
       textStyle: TextStyle(
-        fontSize: ESizes.fontSizeLg,
+        fontSize: 30,
         fontWeight: FontWeight.w600,
         color: EColors.dark,
       ),
     ),
     titleLarge: GoogleFonts.lexend(
       textStyle: TextStyle(
-        fontSize: ESizes.fontSizeMd,
+        fontSize: 18,
         color: EColors.white,
       ),
     ),
     titleMedium: GoogleFonts.lexend(
       textStyle: TextStyle(
-        fontSize: ESizes.fontSizeMd,
+        fontSize: 18,
         color: EColors.black,
       ),
     ),
     labelLarge: GoogleFonts.lexend(
       textStyle: TextStyle(
-        fontSize: ESizes.fontSizeSm,
+        fontSize: 16,
         color: EColors.grey,
       ),
     ),

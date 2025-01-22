@@ -1,5 +1,5 @@
 import 'package:emotion_check_in_app/provider/auth_provider.dart';
-import 'package:emotion_check_in_app/screens/onBoard/on_boarding_screen.dart';
+import 'package:emotion_check_in_app/screens/auth/login_screen.dart';
 import 'package:emotion_check_in_app/utils/constants/colors.dart';
 import 'package:emotion_check_in_app/utils/constants/sizes.dart';
 import 'package:emotion_check_in_app/utils/constants/text_strings.dart';
@@ -25,13 +25,13 @@ class _HomeScreenState extends State<HomeScreen> {
     final hour = DateTime.now().hour;
 
     if (hour >= 5 && hour < 12) {
-      return ETexts.morning;
+      return ETexts.MORNING;
     } else if (hour >= 12 && hour < 17) {
-      return ETexts.noon;
+      return ETexts.NOON;
     } else if (hour >= 17 && hour < 21) {
-      return ETexts.evening;
+      return ETexts.EVENING;
     } else {
-      return ETexts.night;
+      return ETexts.NIGHT;
     }
   }
 
@@ -70,7 +70,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     // Handle logout
                     final authProvider = Provider.of<AuthProvider>(context, listen: false);
                     await authProvider.logout();
-                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => OnBoardingScreen()));
+                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginScreen()));
                     EHelperFunctions.showSnackBar(context, 'Logout Successfully.');
                   },
                   style: OutlinedButton.styleFrom(
@@ -135,12 +135,12 @@ class _HomeScreenState extends State<HomeScreen> {
                       shape: BoxShape.circle,
                     ),
                     holidayTextStyle: const TextStyle(color: EColors.lateColor),
-                    weekendTextStyle: const TextStyle(color: EColors.white),
+                    weekendTextStyle: const TextStyle(color: EColors.dark),
                     defaultDecoration: BoxDecoration(
                       color: EColors.onTimeColor,
                       shape: BoxShape.circle,
                     ),
-                    defaultTextStyle: const TextStyle(color: EColors.white),
+                    defaultTextStyle: const TextStyle(color: EColors.dark),
                     outsideDaysVisible: false,
                   ),
                 ),

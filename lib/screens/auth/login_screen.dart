@@ -117,7 +117,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         const SizedBox(height: 70),
                         Text(
-                          ETexts.logInTitle,
+                          ETexts.LOGINPAGETITLE,
                           textAlign: TextAlign.start,
                           style: ETextTheme.lightTextTheme.titleMedium,
                         ),
@@ -126,7 +126,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         // Custom Email Field
                         CustomTextFormField(
                           controller: _emailController,
-                          labelText: ETexts.email,
+                          labelText: ETexts.EMAIL,
                           keyboardType: TextInputType.emailAddress,
                           validator: EValidator.validateEmail,
                         ),
@@ -135,7 +135,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         // Custom Password Field with Visibility Toggle
                         CustomTextFormField(
                           controller: _passwordController,
-                          labelText: ETexts.password,
+                          labelText: ETexts.PASSWORD,
                           obscureText: !_isPasswordVisible,
                           validator: EValidator.validatePassword,
                           suffixIcon: IconButton(
@@ -161,7 +161,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               // Handle forgot password logic
                             },
                             child: const Text(
-                              ETexts.forgotPw,
+                              ETexts.FORGOTPW,
                               style: TextStyle(color: EColors.grey),
                             ),
                           ),
@@ -187,14 +187,14 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                               const SizedBox(width: 10),
                               Text(
-                                ETexts.processing,
+                                ETexts.PROCESSING,
                                 style:
                                 ETextTheme.lightTextTheme.titleLarge,
                               ),
                             ],
                           )
                               : Text(
-                            ETexts.logIn,
+                            ETexts.LOGIN,
                             style: ETextTheme.lightTextTheme.titleLarge,
                           ),
                         ),
@@ -224,7 +224,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                               const SizedBox(width: 10),
                               Text(
-                                ETexts.google,
+                                ETexts.GOOGLE,
                                 style:
                                 ETextTheme.lightTextTheme.titleMedium,
                               ),

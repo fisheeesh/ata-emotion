@@ -29,11 +29,11 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
     _pageController.dispose();
   }
 
-  // _storeOnBoardInfo() async{
-  //   int isViewed = 0;
-  //   SharedPreferences pref = await SharedPreferences.getInstance();
-  //   await pref.setInt('onBoard', isViewed);
-  // }
+  _storeOnBoardInfo() async{
+    int isViewed = 0;
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    await pref.setInt('onBoard', isViewed);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -128,8 +128,8 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                           padding: const EdgeInsets.symmetric(horizontal: ESizes.md),
                           child: Text(
                             onLastPage
-                                ? ETexts.onBoardingTitle2
-                                : ETexts.onBoardingTitle1,
+                                ? ETexts.ONBOARDINGTITLE2
+                                : ETexts.ONBOARDINGTITLE1,
                             key: ValueKey<bool>(onLastPage),
                             textAlign: TextAlign.center,
                             style: ETextTheme.lightTextTheme.headlineLarge,
@@ -140,8 +140,8 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                         padding: const EdgeInsets.only(top: ESizes.sm, bottom: ESizes.sm),
                         child: Text(
                           onLastPage
-                              ? ETexts.onBoardingSubTitle2
-                              : ETexts.onBoardingSubTitle1,
+                              ? ETexts.ONBOARDINGSUBTITLE2
+                              : ETexts.ONBOARDINGSUBTITLE1,
                           key: ValueKey<bool>(onLastPage),
                           style: ETextTheme.lightTextTheme.labelLarge,
                         ),
@@ -184,11 +184,11 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                           width: 298,
                           height: ESizes.hNormal,
                           child: Text(
-                            ETexts.logIn,
+                            ETexts.LOGIN,
                             style: ETextTheme.lightTextTheme.titleLarge,
                           ),
-                          onPressed: () {
-                            // await _storeOnBoardInfo();
+                          onPressed: () async{
+                            await _storeOnBoardInfo();
                             Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
@@ -201,7 +201,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                         width: ESizes.wFull,
                         height: ESizes.hNormal,
                         child: Text(
-                          ETexts.next,
+                          ETexts.NEXT,
                           style: ETextTheme.lightTextTheme.titleLarge,
                         ),
                         onPressed: () {

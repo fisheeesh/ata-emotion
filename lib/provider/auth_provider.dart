@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:emotion_check_in_app/utils/constants/text_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
@@ -13,8 +14,6 @@ class AuthProvider extends ChangeNotifier {
   GoogleSignInAccount? _user;
 
   GoogleSignInAccount? get user => _user;
-
-  static const String BASE_URL = 'https://10.0.2.2:8443/security/auth';
 
   /// Login with Google and authorize with the backend
   Future<bool> loginAndAuthorize() async {
@@ -51,7 +50,7 @@ class AuthProvider extends ChangeNotifier {
         'Token': 'Bearer $accessToken',
       };
 
-      debugPrint("Requesting to URL: $BASE_URL");
+      debugPrint("Requesting to URL: ${ETexts.BASE_URL}");
       debugPrint("Request Headers: $headers");
 
       // Allow self-signed certificates during development
@@ -61,7 +60,7 @@ class AuthProvider extends ChangeNotifier {
       IOClient ioClient = IOClient(httpClient);
 
       final response = await ioClient.post(
-        Uri.parse(BASE_URL),
+        Uri.parse(ETexts.BASE_URL),
         headers: headers,
       );
 
