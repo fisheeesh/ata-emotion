@@ -40,6 +40,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
     return Scaffold(
       body: Stack(
         children: [
+
           // Centered image
           Padding(
             padding: const EdgeInsets.only(top: ESizes.xl),
@@ -50,7 +51,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
             ),
           ),
 
-          // Full logo (foreground element)
+          // Full logo
           Padding(
             padding: const EdgeInsets.only(top: ESizes.xl, left: ESizes.xl, right: ESizes.xl),
             child: Align(

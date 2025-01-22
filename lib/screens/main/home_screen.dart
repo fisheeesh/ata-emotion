@@ -5,13 +5,11 @@ import 'package:emotion_check_in_app/utils/constants/sizes.dart';
 import 'package:emotion_check_in_app/utils/constants/text_strings.dart';
 import 'package:emotion_check_in_app/utils/helpers/helper_functions.dart';
 import 'package:flutter/material.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class HomeScreen extends StatefulWidget {
-  final GoogleSignInAccount? user;
-  const HomeScreen({super.key, required this.user});
+  const HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -60,7 +58,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           fontWeight: FontWeight.bold),
                     ),
                     Text(
-                      widget.user!.displayName! ?? 'Users',
+                      'Users',
                       style: TextStyle(color: Colors.grey, fontSize: 16),
                     ),
                   ],

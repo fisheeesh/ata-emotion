@@ -1,18 +1,25 @@
-import 'dart:convert';
 import 'dart:io';
 import 'package:emotion_check_in_app/utils/constants/text_strings.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:http/http.dart' as http;
 import 'package:http/io_client.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthProvider extends ChangeNotifier {
   final GoogleSignIn _googleSignIn = GoogleSignIn(
     scopes: ['email', 'profile'],
   );
 
-  GoogleSignInAccount? _user;
+  final _storage = const FlutterSecureStorage();
 
+  String? _authToken;
+  String? _refreshToken;
+
+  String? get authToken => _authToken;
+  String? get refreshToken => _refreshToken;
+
+  GoogleSignInAccount? _user;
   GoogleSignInAccount? get user => _user;
 
   /// Login with Google and authorize with the backend
@@ -50,7 +57,7 @@ class AuthProvider extends ChangeNotifier {
         'Token': 'Bearer $accessToken',
       };
 
-      debugPrint("Requesting to URL: ${ETexts.BASE_URL}");
+      debugPrint("Requesting to URL: ${ETexts.BASE_URL}", );
       debugPrint("Request Headers: $headers");
 
       // Allow self-signed certificates during development
@@ -65,11 +72,15 @@ class AuthProvider extends ChangeNotifier {
       );
 
       if (response.statusCode == 200) {
-        final authToken = response.headers['authorization'];
-        final refreshToken = response.headers['refresh'];
+        _authToken = response.headers['authorization'];
+        _refreshToken = response.headers['refresh'];
 
-        debugPrint("Authorization Token: $authToken");
-        debugPrint("Refresh Token: $refreshToken");
+        if (_authToken != null && _refreshToken != null) {
+          final cleanAuthToken = _authToken!.replaceFirst('Bearer ', '');
+          final cleanRefreshToken = _refreshToken!.replaceFirst('Bearer ', '');
+          await saveTokens(cleanAuthToken, cleanRefreshToken);
+          debugPrint("Tokens saved successfully.");
+        }
 
         return true;
       } else {
@@ -82,14 +93,35 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  /// Logs out the user
+  /// Logs out the user and clears tokens
+  /// Logs out the user and clears tokens
   Future<void> logout() async {
     try {
+      // Clear Google sign-in session
       await _googleSignIn.disconnect();
       _user = null;
+
+      // Clear tokens from secure storage
+      await clearTokens();
+
+      // Clear token from SharedPreferences
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.remove('token');
+
       notifyListeners();
     } catch (e) {
       debugPrint("Logout Error: $e");
     }
+  }
+
+  /// Saves tokens securely in FlutterSecureStorage
+  Future<void> saveTokens(String authToken, String refreshToken) async {
+    await _storage.write(key: 'auth_token', value: authToken);
+    await _storage.write(key: 'refresh_token', value: refreshToken);
+  }
+
+  /// Clears all tokens from storage
+  Future<void> clearTokens() async {
+    await _storage.deleteAll();
   }
 }

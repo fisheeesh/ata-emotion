@@ -6,12 +6,12 @@ import 'package:emotion_check_in_app/screens/main/home_screen.dart';
 import 'package:emotion_check_in_app/utils/constants/colors.dart';
 import 'package:emotion_check_in_app/utils/constants/image_strings.dart';
 import 'package:emotion_check_in_app/utils/constants/text_strings.dart';
-import 'package:emotion_check_in_app/utils/helpers/helper_functions.dart';
 import 'package:emotion_check_in_app/utils/validator/validator.dart';
 import 'package:flutter/material.dart';
 import 'package:emotion_check_in_app/utils/theme/text_theme.dart';
 import 'package:emotion_check_in_app/utils/constants/sizes.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -24,16 +24,28 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+  late SharedPreferences prefs;
 
   bool _isPasswordVisible = false;
   bool _isLoading = false;
   bool _isGoogleLoading = false;
+
+
+  @override
+  void initState() {
+    super.initState();
+    initSharePref();
+  }
 
   @override
   void dispose() {
     super.dispose();
     _emailController.dispose();
     _passwordController.dispose();
+  }
+
+  void initSharePref () async{
+    prefs = await SharedPreferences.getInstance();
   }
 
   void _handleLogin() {
@@ -64,22 +76,24 @@ class _LoginScreenState extends State<LoginScreen> {
 
       // Perform login and authorization
       final isAuthorized = await authProvider.loginAndAuthorize();
-
-      if (isAuthorized) {
+      final myToken = authProvider.refreshToken;
+      if (isAuthorized && myToken != null) {
+        await prefs.setString('token', myToken); // Save the full token
         // Navigate to HomeScreen if authorized
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => HomeScreen(user: authProvider.user),
+            builder: (context) => const HomeScreen(),
           ),
         );
       } else {
         // Show error if authorization fails
-        EHelperFunctions.showSnackBar(context, 'Authorization Failed.');
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Authorization Failed.')),
+        );
       }
     } catch (e) {
       debugPrint("Google Login Error: $e");
-      EHelperFunctions.showSnackBar(context, 'Google Sign-in Failed.');
     } finally {
       setState(() {
         _isGoogleLoading = false;
