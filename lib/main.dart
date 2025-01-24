@@ -18,13 +18,22 @@ void main() async {
   isViewed = prefs.getInt('onBoard');
 
   final storage = const FlutterSecureStorage();
+  final authProvider = AuthProvider();
 
-  /// Fetch the token from Secure Storage
+  /// Fetch token and restore email
   token = await storage.read(key: 'refresh_token');
-  /// Log the saved token for debugging
-  debugPrint("Saved Token: $token");
+  if (token != null && authProvider.isTokenValid(token)) {
+    await authProvider.restoreUserEmail();
+  }
 
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => authProvider), // Use initialized instance
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -32,33 +41,19 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => AuthProvider()),
-      ],
-      child: const App(),
-    );
-  }
-}
-
-class App extends StatelessWidget {
-  const App({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Consumer<AuthProvider>(
-      builder: (context, authProvider, _) {
-        return MaterialApp(
-          title: 'ATA - Emotion Check-in Application',
-          theme: EAppTheme.lightTheme,
-          debugShowCheckedModeBanner: false,
-          home: isViewed != 0
+    return MaterialApp(
+      title: 'ATA - Emotion Check-in Application',
+      theme: EAppTheme.lightTheme,
+      debugShowCheckedModeBanner: false,
+      home: Consumer<AuthProvider>(
+        builder: (context, authProvider, _) {
+          return isViewed != 0
               ? const OnBoardingScreen()
               : authProvider.isTokenValid(token)
-              ? HomeScreen()
-              : const LoginScreen(),
-        );
-      },
+              ? const HomeScreen()
+              : const LoginScreen();
+        },
+      ),
     );
   }
 }

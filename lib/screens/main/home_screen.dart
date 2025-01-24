@@ -34,6 +34,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
   @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context);
+    
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7FB),
       body: Padding(
@@ -57,7 +59,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           fontWeight: FontWeight.bold),
                     ),
                     Text(
-                      'Users',
+                      authProvider.userEmail ?? 'User',
                       style: TextStyle(color: Colors.grey, fontSize: 16),
                     ),
                   ],

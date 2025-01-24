@@ -16,6 +16,9 @@ class AuthProvider extends ChangeNotifier {
   GoogleSignInAccount? _user;
   GoogleSignInAccount? get user => _user;
 
+  String? _userEmail;
+  String? get userEmail => _userEmail;
+
   /// Login with Google and authorize with the backend
   Future<bool> loginAndAuthorize() async {
     try {
@@ -65,7 +68,7 @@ class AuthProvider extends ChangeNotifier {
         headers: headers,
       );
 
-      debugPrint('Response: $response');
+      debugPrint('Response: ${response.body}');
 
       if (response.statusCode == 200) {
         final authToken = response.headers['authorization'];
@@ -73,6 +76,7 @@ class AuthProvider extends ChangeNotifier {
 
         if (authToken != null && refreshToken != null) {
           await saveTokens(authToken, refreshToken);
+          _decodeEmailFromToken(authToken); // Decode and store the email
           debugPrint("Tokens saved successfully.");
         }
 
@@ -87,25 +91,31 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
+  /// Decode email from the token and store it
+  void _decodeEmailFromToken(String token) {
+    try {
+      final Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
+      _userEmail = decodedToken['sub']; // Assuming 'sub' contains the email
+      notifyListeners();
+    } catch (e) {
+      debugPrint("Error decoding token: $e");
+    }
+  }
+
   /// Logs out the user and clears tokens
   Future<void> logout() async {
     try {
-      /// Clear Google sign-in session
       await _googleSignIn.disconnect();
-
-      /// Set user to null when logged out
       _user = null;
-
-      /// Clear tokens from secure storage
+      _userEmail = null;
       await clearTokens();
-
       notifyListeners();
     } catch (e) {
       debugPrint("Logout Error: $e");
     }
   }
 
-  /// Saves tokens securely in FlutterSecureStorage
+  /// Save tokens securely in FlutterSecureStorage
   Future<void> saveTokens(String authToken, String refreshToken) async {
     await _storage.write(key: 'auth_token', value: authToken);
     await _storage.write(key: 'refresh_token', value: refreshToken);
@@ -116,14 +126,19 @@ class AuthProvider extends ChangeNotifier {
     await _storage.deleteAll();
   }
 
-  /// To check the refresh toke is valid or expired
+  /// Restore email from stored token
+  Future<void> restoreUserEmail() async {
+    final authToken = await _storage.read(key: 'auth_token');
+    if (authToken != null && isTokenValid(authToken)) {
+      _decodeEmailFromToken(authToken);
+    }
+  }
+
+  /// To check if the token is valid or expired
   bool isTokenValid(String? token) {
     if (token == null || token.isEmpty) return false;
     try {
-      /// Remove "Bearer " prefix if it exists
       final cleanToken = token.startsWith('Bearer ') ? token.substring(7) : token;
-
-      /// Decode and check expiration
       return !JwtDecoder.isExpired(cleanToken);
     } catch (e) {
       debugPrint("Invalid token: $e");
