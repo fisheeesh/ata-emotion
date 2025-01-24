@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/io_client.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
 
 class AuthProvider extends ChangeNotifier {
   final GoogleSignIn _googleSignIn = GoogleSignIn(
@@ -12,12 +12,6 @@ class AuthProvider extends ChangeNotifier {
   );
 
   final _storage = const FlutterSecureStorage();
-
-  String? _authToken;
-  String? _refreshToken;
-
-  String? get authToken => _authToken;
-  String? get refreshToken => _refreshToken;
 
   GoogleSignInAccount? _user;
   GoogleSignInAccount? get user => _user;
@@ -57,10 +51,10 @@ class AuthProvider extends ChangeNotifier {
         'Token': 'Bearer $accessToken',
       };
 
-      debugPrint("Requesting to URL: ${ETexts.BASE_URL}", );
+      debugPrint("Requesting to URL: ${ETexts.BASE_URL}");
       debugPrint("Request Headers: $headers");
 
-      // Allow self-signed certificates during development
+      /// Allow self-signed certificates during development
       HttpClient httpClient = HttpClient()
         ..badCertificateCallback =
             (X509Certificate cert, String host, int port) => true;
@@ -71,14 +65,14 @@ class AuthProvider extends ChangeNotifier {
         headers: headers,
       );
 
-      if (response.statusCode == 200) {
-        _authToken = response.headers['authorization'];
-        _refreshToken = response.headers['refresh'];
+      debugPrint('Response: $response');
 
-        if (_authToken != null && _refreshToken != null) {
-          final cleanAuthToken = _authToken!.replaceFirst('Bearer ', '');
-          final cleanRefreshToken = _refreshToken!.replaceFirst('Bearer ', '');
-          await saveTokens(cleanAuthToken, cleanRefreshToken);
+      if (response.statusCode == 200) {
+        final authToken = response.headers['authorization'];
+        final refreshToken = response.headers['refresh'];
+
+        if (authToken != null && refreshToken != null) {
+          await saveTokens(authToken, refreshToken);
           debugPrint("Tokens saved successfully.");
         }
 
@@ -94,19 +88,16 @@ class AuthProvider extends ChangeNotifier {
   }
 
   /// Logs out the user and clears tokens
-  /// Logs out the user and clears tokens
   Future<void> logout() async {
     try {
-      // Clear Google sign-in session
+      /// Clear Google sign-in session
       await _googleSignIn.disconnect();
+
+      /// Set user to null when logged out
       _user = null;
 
-      // Clear tokens from secure storage
+      /// Clear tokens from secure storage
       await clearTokens();
-
-      // Clear token from SharedPreferences
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.remove('token');
 
       notifyListeners();
     } catch (e) {
@@ -123,5 +114,20 @@ class AuthProvider extends ChangeNotifier {
   /// Clears all tokens from storage
   Future<void> clearTokens() async {
     await _storage.deleteAll();
+  }
+
+  /// To check the refresh toke is valid or expired
+  bool isTokenValid(String? token) {
+    if (token == null || token.isEmpty) return false;
+    try {
+      /// Remove "Bearer " prefix if it exists
+      final cleanToken = token.startsWith('Bearer ') ? token.substring(7) : token;
+
+      /// Decode and check expiration
+      return !JwtDecoder.isExpired(cleanToken);
+    } catch (e) {
+      debugPrint("Invalid token: $e");
+      return false;
+    }
   }
 }

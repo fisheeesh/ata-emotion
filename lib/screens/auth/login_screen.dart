@@ -76,14 +76,12 @@ class _LoginScreenState extends State<LoginScreen> {
 
       // Perform login and authorization
       final isAuthorized = await authProvider.loginAndAuthorize();
-      final myToken = authProvider.refreshToken;
-      if (isAuthorized && myToken != null) {
-        await prefs.setString('token', myToken); // Save the full token
+      if (isAuthorized) {
         // Navigate to HomeScreen if authorized
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => const HomeScreen(),
+            builder: (context) => HomeScreen(),
           ),
         );
       } else {

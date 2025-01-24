@@ -32,7 +32,6 @@ class _HomeScreenState extends State<HomeScreen> {
       return ETexts.NIGHT;
     }
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
