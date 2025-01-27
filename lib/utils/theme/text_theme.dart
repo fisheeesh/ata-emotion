@@ -13,6 +13,13 @@ class ETextTheme {
         color: EColors.dark,
       ),
     ),
+    headlineMedium: GoogleFonts.lexend(
+      textStyle: TextStyle(
+        fontSize: 24,
+        fontWeight: FontWeight.w600,
+        color: EColors.dark,
+      ),
+    ),
     titleLarge: GoogleFonts.lexend(
       textStyle: TextStyle(
         fontSize: 18,
@@ -22,6 +29,12 @@ class ETextTheme {
     titleMedium: GoogleFonts.lexend(
       textStyle: TextStyle(
         fontSize: 18,
+        color: EColors.black,
+      ),
+    ),
+    titleSmall: GoogleFonts.lexend(
+      textStyle: TextStyle(
+        fontSize: 16,
         color: EColors.black,
       ),
     ),

@@ -2,6 +2,7 @@ import 'package:emotion_check_in_app/provider/auth_provider.dart';
 import 'package:emotion_check_in_app/utils/constants/colors.dart';
 import 'package:emotion_check_in_app/utils/constants/sizes.dart';
 import 'package:emotion_check_in_app/utils/constants/text_strings.dart';
+import 'package:emotion_check_in_app/utils/theme/text_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -238,18 +239,53 @@ class _HomeScreenState extends State<HomeScreen> {
 
   OutlinedButton _logOutButton(BuildContext context) {
     return OutlinedButton(
-              onPressed: () async{
-                // Handle logout
-                await context.read<AuthProvider>().logout(context);
+      onPressed: () async {
+        // Show confirmation dialog
+        final shouldLogout = await _showLogoutConfirmationDialog(context);
+
+        if (shouldLogout) {
+          // Handle logout
+          await context.read<AuthProvider>().logout(context);
+        }
+      },
+      style: OutlinedButton.styleFrom(
+        side: const BorderSide(color: EColors.danger),
+        foregroundColor: EColors.danger,
+      ),
+      child: const Text(
+        ETexts.LOGOUT,
+        style: TextStyle(fontWeight: FontWeight.bold),
+      ),
+    );
+  }
+
+  Future<bool> _showLogoutConfirmationDialog(BuildContext context) async {
+    return await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Confirm Logout.",style: ETextTheme.lightTextTheme.headlineMedium,),
+          content: Text("Are you sure you want to log out?", style: ETextTheme.lightTextTheme.titleSmall,),
+          actions: [
+            TextButton(
+              onPressed: () {
+                /// Dismiss the dialog and return false
+                Navigator.of(context).pop(false);
               },
-              style: OutlinedButton.styleFrom(
-                side: const BorderSide(color: EColors.danger),
-                foregroundColor: EColors.danger,
-              ),
-              child: const Text(
-                ETexts.LOGOUT,
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            );
+              child: const Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () {
+                /// Dismiss the dialog and return true
+                Navigator.of(context).pop(true);
+              },
+              child: const Text("OK"),
+            ),
+          ],
+        );
+      },
+    ) ??
+        /// If the dialog is dismissed without a choice, return false
+        false;
   }
 }

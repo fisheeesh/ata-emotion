@@ -4,6 +4,7 @@ import 'package:emotion_check_in_app/utils/constants/colors.dart';
 import 'package:emotion_check_in_app/utils/constants/image_strings.dart';
 import 'package:emotion_check_in_app/utils/constants/sizes.dart';
 import 'package:emotion_check_in_app/utils/constants/text_strings.dart';
+import 'package:emotion_check_in_app/utils/helpers/helper_functions.dart';
 import 'package:emotion_check_in_app/utils/theme/text_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -133,7 +134,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                       ),
                       onPressed: () async{
                         await _storeOnBoardInfo();
-                        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginScreen()));
+                        EHelperFunctions.navigateToScreen(context, LoginScreen());
                       },
                     );
   }

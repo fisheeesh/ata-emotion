@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:emotion_check_in_app/screens/auth/login_screen.dart';
 import 'package:emotion_check_in_app/screens/main/home_screen.dart';
@@ -55,10 +56,10 @@ class AuthProvider extends ChangeNotifier {
         return;
       }
 
-      final isAuthorized = await _sendAccessTokenToServer(accessToken);
+      final isAuthorized = await _sendAccessTokenToServer(accessToken, context);
 
       if (isAuthorized) {
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomeScreen()));
+        EHelperFunctions.navigateToScreen(context, HomeScreen());
       }
     } catch (e) {
       debugPrint("Google Login Error: $e");
@@ -69,7 +70,8 @@ class AuthProvider extends ChangeNotifier {
   }
 
   /// Sends access token to the backend server
-  Future<bool> _sendAccessTokenToServer(String accessToken) async {
+  /// Sends access token to the backend server with a timeout
+  Future<bool> _sendAccessTokenToServer(String accessToken, BuildContext context) async {
     try {
       final headers = {
         'Content-Type': 'application/json',
@@ -79,17 +81,20 @@ class AuthProvider extends ChangeNotifier {
       debugPrint("Requesting to URL: ${ETexts.BASE_URL}");
       debugPrint("Request Headers: $headers");
 
-      /// Allow self-signed certificates during development (ONLY FOR DEVELOPMENT)
-      /// Later we will use a certificate from a trusted CA from production
+      // Allow self-signed certificates during development
       HttpClient httpClient = HttpClient()
         ..badCertificateCallback =
             (X509Certificate cert, String host, int port) => true;
       IOClient ioClient = IOClient(httpClient);
 
-      final response = await ioClient.post(
+      /// Set a timeout for the HTTP request
+      /// Timeout set to 10 seconds
+      final response = await ioClient
+          .post(
         Uri.parse(ETexts.BASE_URL),
         headers: headers,
-      );
+      )
+          .timeout(const Duration(seconds: 30));
 
       debugPrint('Response: ${response.body}');
 
@@ -99,7 +104,8 @@ class AuthProvider extends ChangeNotifier {
 
         if (authToken != null && refreshToken != null) {
           await saveTokens(authToken, refreshToken);
-          /// Decode and store the email
+
+          // Decode and store the email
           _decodeEmailFromToken(authToken);
           debugPrint("Tokens saved successfully.");
         }
@@ -109,6 +115,13 @@ class AuthProvider extends ChangeNotifier {
         debugPrint("Authorization Failed: ${response.body}");
         return false;
       }
+    } on TimeoutException {
+      debugPrint("Request Timeout: The server took too long to respond.");
+      EHelperFunctions.showSnackBar(
+        context,
+        "Request timed out. Please try again later.",
+      );
+      return false;
     } catch (e) {
       debugPrint("Error sending access token to server: $e");
       return false;
@@ -129,14 +142,12 @@ class AuthProvider extends ChangeNotifier {
   /// Logs out the user and clears tokens
   Future<void> logout(BuildContext context) async {
     try {
-      if (_googleSignIn.currentUser != null) {
-        await _googleSignIn.disconnect();
-      }
+      await _googleSignIn.disconnect();
       _user = null;
       _userEmail = null;
       await clearTokens();
       notifyListeners();
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginScreen()));
+      EHelperFunctions.navigateToScreen(context, LoginScreen());
       EHelperFunctions.showSnackBar(context, 'Logout Successfully.');
     } catch (e) {
       debugPrint("Logout Error: $e");
