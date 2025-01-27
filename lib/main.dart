@@ -20,16 +20,16 @@ void main() async {
   final storage = const FlutterSecureStorage();
   final authProvider = AuthProvider();
 
-  /// Fetch token and restore email
+  /// Fetch the refresh token and restore the user's name
   token = await storage.read(key: 'refresh_token');
   if (token != null && authProvider.isTokenValid(token)) {
-    await authProvider.restoreUserEmail();
+    await authProvider.restoreUserName();
   }
 
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => authProvider), // Use initialized instance
+        ChangeNotifierProvider(create: (_) => authProvider),
       ],
       child: const MyApp(),
     ),

@@ -2,7 +2,6 @@ import 'package:emotion_check_in_app/components/buttons/custom_button.dart';
 import 'package:emotion_check_in_app/components/formFields/custom_text_form_field.dart';
 import 'package:emotion_check_in_app/components/buttons/custom_outlined_button.dart';
 import 'package:emotion_check_in_app/provider/auth_provider.dart';
-import 'package:emotion_check_in_app/screens/main/home_screen.dart';
 import 'package:emotion_check_in_app/utils/constants/colors.dart';
 import 'package:emotion_check_in_app/utils/constants/image_strings.dart';
 import 'package:emotion_check_in_app/utils/constants/text_strings.dart';
@@ -28,8 +27,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
   bool _isPasswordVisible = false;
   bool _isLoading = false;
-  bool _isGoogleLoading = false;
-
 
   @override
   void initState() {
@@ -66,41 +63,10 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  Future<void> _handleGoogleLogin() async {
-    setState(() {
-      _isGoogleLoading = true;
-    });
-
-    try {
-      final authProvider = Provider.of<AuthProvider>(context, listen: false);
-
-      // Perform login and authorization
-      final isAuthorized = await authProvider.loginAndAuthorize();
-      if (isAuthorized) {
-        // Navigate to HomeScreen if authorized
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => HomeScreen(),
-          ),
-        );
-      } else {
-        // Show error if authorization fails
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Authorization Failed.')),
-        );
-      }
-    } catch (e) {
-      debugPrint("Google Login Error: $e");
-    } finally {
-      setState(() {
-        _isGoogleLoading = false;
-      });
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
+    final isGoogleLoading = context.watch<AuthProvider>().isLoading;
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: GestureDetector(
@@ -111,6 +77,7 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: ESizes.md),
                 width: double.infinity,
+                /// Form
                 child: Form(
                   key: _formKey,
                   child: SingleChildScrollView(
@@ -118,24 +85,14 @@ class _LoginScreenState extends State<LoginScreen> {
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        // Logo section
-                        Column(
-                          children: [
-                            Image.asset(
-                              EImages.ataLogo,
-                              height: ESizes.hNormal,
-                            ),
-                          ],
-                        ),
+                        /// ATA Logo
+                        _logoSection(),
                         const SizedBox(height: 70),
-                        Text(
-                          ETexts.LOGINPAGETITLE,
-                          textAlign: TextAlign.start,
-                          style: ETextTheme.lightTextTheme.titleMedium,
-                        ),
+                        /// Form Title
+                        _formTitleSection(),
                         const SizedBox(height: 15),
 
-                        // Custom Email Field
+                        /// Email Field
                         CustomTextFormField(
                           controller: _emailController,
                           labelText: ETexts.EMAIL,
@@ -144,7 +101,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         const SizedBox(height: 20),
 
-                        // Custom Password Field with Visibility Toggle
+                        /// Password Field with Visibility Toggle
                         CustomTextFormField(
                           controller: _passwordController,
                           labelText: ETexts.PASSWORD,
@@ -165,84 +122,16 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         const SizedBox(height: 10),
 
-                        // Forgot Password
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: TextButton(
-                            onPressed: () {
-                              // Handle forgot password logic
-                            },
-                            child: const Text(
-                              ETexts.FORGOTPW,
-                              style: TextStyle(color: EColors.grey),
-                            ),
-                          ),
-                        ),
+                        /// Forgot Password
+                        _forgotPasswordSection(),
                         const SizedBox(height: 10),
 
-                        // Login Button
-                        CustomButton(
-                          width: ESizes.wFull,
-                          height: ESizes.hNormal,
-                          onPressed: _isLoading ? null : _handleLogin,
-                          child: _isLoading
-                              ? Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const SizedBox(
-                                width: ESizes.wXs,
-                                height: ESizes.hXs,
-                                child: CircularProgressIndicator(
-                                  color: EColors.white,
-                                  strokeWidth: 2.0,
-                                ),
-                              ),
-                              const SizedBox(width: 10),
-                              Text(
-                                ETexts.PROCESSING,
-                                style:
-                                ETextTheme.lightTextTheme.titleLarge,
-                              ),
-                            ],
-                          )
-                              : Text(
-                            ETexts.LOGIN,
-                            style: ETextTheme.lightTextTheme.titleLarge,
-                          ),
-                        ),
+                        /// Login Button
+                        _loginButton(),
                         const SizedBox(height: 20),
 
-                        // Continue with Google (Using Custom Outlined Button)
-                        CustomOutlinedButton(
-                          width: double.infinity,
-                          height: 55,
-                          borderColor: EColors.primary,
-                          onPressed: _isGoogleLoading ? null : _handleGoogleLogin,
-                          child: _isGoogleLoading
-                              ? const SizedBox(
-                            width: ESizes.wXs,
-                            height: ESizes.hXs,
-                            child: CircularProgressIndicator(
-                              color: EColors.primary,
-                              strokeWidth: 2.0,
-                            ),
-                          )
-                              : Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Image.asset(
-                                EImages.googleLogo,
-                                height: ESizes.hXs,
-                              ),
-                              const SizedBox(width: 10),
-                              Text(
-                                ETexts.GOOGLE,
-                                style:
-                                ETextTheme.lightTextTheme.titleMedium,
-                              ),
-                            ],
-                          ),
-                        ),
+                        /// Google Login Button
+                        _googleLoginButton(isGoogleLoading, context),
                       ],
                     ),
                   ),
@@ -253,5 +142,102 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ),
     );
+  }
+
+  CustomOutlinedButton _googleLoginButton(bool isGoogleLoading, BuildContext context) {
+    return CustomOutlinedButton(
+                        width: double.infinity,
+                        height: 55,
+                        borderColor: EColors.primary,
+                        onPressed: isGoogleLoading ? null : () async {
+                          await context.read<AuthProvider>().loginAndAuthorize(context);
+                        },
+                        child: isGoogleLoading
+                            ? const SizedBox(
+                          width: ESizes.wXs,
+                          height: ESizes.hXs,
+                          child: CircularProgressIndicator(
+                            color: EColors.primary,
+                            strokeWidth: 2.0,
+                          ),
+                        )
+                            : Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Image.asset(
+                              EImages.googleLogo,
+                              height: ESizes.hXs,
+                            ),
+                            const SizedBox(width: 10),
+                            Text(
+                              ETexts.GOOGLE,
+                              style:
+                              ETextTheme.lightTextTheme.titleMedium,
+                            ),
+                          ],
+                        ),
+                      );
+  }
+
+  CustomButton _loginButton() {
+    return CustomButton(
+                        width: ESizes.wFull,
+                        height: ESizes.hNormal,
+                        onPressed: _isLoading ? null : _handleLogin,
+                        child: _isLoading
+                            ? Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const SizedBox(
+                              width: ESizes.wXs,
+                              height: ESizes.hXs,
+                              child: CircularProgressIndicator(
+                                color: EColors.white,
+                                strokeWidth: 2.0,
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Text(
+                              ETexts.PROCESSING,
+                              style:
+                              ETextTheme.lightTextTheme.titleLarge,
+                            ),
+                          ],
+                        )
+                            : Text(
+                          ETexts.LOGIN,
+                          style: ETextTheme.lightTextTheme.titleLarge,
+                        ),
+                      );
+  }
+
+  Align _forgotPasswordSection() {
+    return Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton(
+                          onPressed: () {
+                            // Handle forgot password logic
+                          },
+                          child: const Text(
+                            ETexts.FORGOTPW,
+                            style: TextStyle(color: EColors.grey),
+                          ),
+                        ),
+                      );
+  }
+
+  Text _formTitleSection() {
+    return Text(
+                        ETexts.LOGINPAGETITLE,
+                        textAlign: TextAlign.start,
+                        style: ETextTheme.lightTextTheme.titleMedium,
+                      );
+  }
+
+  Image _logoSection() {
+    return Image.asset(
+                            EImages.ataLogo,
+                            height: ESizes.hNormal,
+                          );
   }
 }

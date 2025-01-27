@@ -14,7 +14,7 @@ class EValidator{
       return 'Password is required.';
     }
 
-    // mini lenght
+    // mini length
     if(value.length < 6){
       return 'Password must be at least 6 characters.';
     }

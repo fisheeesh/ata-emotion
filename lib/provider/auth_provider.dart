@@ -1,5 +1,8 @@
 import 'dart:io';
+import 'package:emotion_check_in_app/screens/auth/login_screen.dart';
+import 'package:emotion_check_in_app/screens/main/home_screen.dart';
 import 'package:emotion_check_in_app/utils/constants/text_strings.dart';
+import 'package:emotion_check_in_app/utils/helpers/helper_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -10,7 +13,6 @@ class AuthProvider extends ChangeNotifier {
   final GoogleSignIn _googleSignIn = GoogleSignIn(
     scopes: ['email', 'profile'],
   );
-
   final _storage = const FlutterSecureStorage();
 
   GoogleSignInAccount? _user;
@@ -19,30 +21,50 @@ class AuthProvider extends ChangeNotifier {
   String? _userEmail;
   String? get userEmail => _userEmail;
 
+  String? _userName;
+  String? get userName => _userName;
+
+  bool _isLoading = false;
+  bool get isLoading => _isLoading;
+
   /// Login with Google and authorize with the backend
-  Future<bool> loginAndAuthorize() async {
+  Future<void> loginAndAuthorize(BuildContext context) async {
     try {
+      _isLoading = true;
+      notifyListeners();
       final user = await _googleSignIn.signIn();
       _user = user;
 
       if (_user == null) {
         debugPrint("Google Sign-In was canceled by the user.");
-        return false;
+        return;
       }
+
+      /// Save the user's name after a successful login
+      _userName = _user!.displayName;
+      notifyListeners();
+
+      /// Store the user's name securely for future use
+      await _storage.write(key: 'user_name', value: _userName);
 
       final auth = await _user!.authentication;
       final accessToken = auth.accessToken;
 
       if (accessToken == null) {
         debugPrint("Access token not available.");
-        return false;
+        return;
       }
 
       final isAuthorized = await _sendAccessTokenToServer(accessToken);
-      return isAuthorized;
+
+      if (isAuthorized) {
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomeScreen()));
+      }
     } catch (e) {
       debugPrint("Google Login Error: $e");
-      return false;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
     }
   }
 
@@ -57,7 +79,8 @@ class AuthProvider extends ChangeNotifier {
       debugPrint("Requesting to URL: ${ETexts.BASE_URL}");
       debugPrint("Request Headers: $headers");
 
-      /// Allow self-signed certificates during development
+      /// Allow self-signed certificates during development (ONLY FOR DEVELOPMENT)
+      /// Later we will use a certificate from a trusted CA from production
       HttpClient httpClient = HttpClient()
         ..badCertificateCallback =
             (X509Certificate cert, String host, int port) => true;
@@ -76,7 +99,8 @@ class AuthProvider extends ChangeNotifier {
 
         if (authToken != null && refreshToken != null) {
           await saveTokens(authToken, refreshToken);
-          _decodeEmailFromToken(authToken); // Decode and store the email
+          /// Decode and store the email
+          _decodeEmailFromToken(authToken);
           debugPrint("Tokens saved successfully.");
         }
 
@@ -95,7 +119,7 @@ class AuthProvider extends ChangeNotifier {
   void _decodeEmailFromToken(String token) {
     try {
       final Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
-      _userEmail = decodedToken['sub']; // Assuming 'sub' contains the email
+      _userEmail = decodedToken['sub'];
       notifyListeners();
     } catch (e) {
       debugPrint("Error decoding token: $e");
@@ -103,16 +127,25 @@ class AuthProvider extends ChangeNotifier {
   }
 
   /// Logs out the user and clears tokens
-  Future<void> logout() async {
+  Future<void> logout(BuildContext context) async {
     try {
-      await _googleSignIn.disconnect();
+      if (_googleSignIn.currentUser != null) {
+        await _googleSignIn.disconnect();
+      }
       _user = null;
       _userEmail = null;
       await clearTokens();
       notifyListeners();
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginScreen()));
+      EHelperFunctions.showSnackBar(context, 'Logout Successfully.');
     } catch (e) {
       debugPrint("Logout Error: $e");
     }
+  }
+  /// Restore user name from Secure Storage
+  Future<void> restoreUserName() async {
+    _userName = await _storage.read(key: 'user_name');
+    notifyListeners();
   }
 
   /// Save tokens securely in FlutterSecureStorage

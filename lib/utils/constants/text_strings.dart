@@ -28,4 +28,7 @@ class ETexts {
   static const String NOON = "Good Afternoon,";
   static const String EVENING = "Good Evening,";
   static const String NIGHT = "Good Night,";
+  static const String DEFAULT_TEXT = "User";
+  static const String LOGOUT = "Log Out";
+  static const String CHECK_IN = "Check In";
 }
