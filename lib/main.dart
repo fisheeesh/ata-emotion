@@ -8,6 +8,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+/// Server as global variable, so they can be access anywhere in this file.
 int? isViewed;
 String? token;
 
@@ -24,6 +25,10 @@ void main() async {
   token = await storage.read(key: 'refresh_token');
   if (token != null && authProvider.isTokenValid(token)) {
     await authProvider.restoreUserName();
+    debugPrint('Token is not expired yet 😉.');
+  }
+  else{
+    debugPrint('Token is already Expired. Please Logged in again.');
   }
 
   runApp(

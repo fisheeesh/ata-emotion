@@ -31,4 +31,19 @@ class ETexts {
   static const String DEFAULT_TEXT = "User";
   static const String LOGOUT = "Log Out";
   static const String CHECK_IN = "Check In";
+  static const String DIALOG_TITLE = "Confirm Logout.";
+  static const String DIALOG_CONTEXT = "Are you sure you want to log out?";
+  static const String OK = "OK";
+  static const String CANCEL = "Cancel";
+
+  // check-in submission screen
+  static const String QUES = "How do you feel today?";
+  static const String HINT = "explain how you feel that way...";
+  static const String SUBMIT = "Submit";
+
+  // success screen
+  static const String SUCCESS_MSG = "Check In Success!";
+  static const String TIME = "Time";
+  static const String HOME = "Home";
 }
+
