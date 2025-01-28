@@ -1,4 +1,6 @@
+import 'package:emotion_check_in_app/models/emotion_check_in.dart';
 import 'package:emotion_check_in_app/provider/auth_provider.dart';
+import 'package:emotion_check_in_app/provider/emotion_check_in_provider.dart';
 import 'package:emotion_check_in_app/screens/main/emotion_check_in_screen.dart';
 import 'package:emotion_check_in_app/utils/constants/colors.dart';
 import 'package:emotion_check_in_app/utils/constants/sizes.dart';
@@ -6,6 +8,7 @@ import 'package:emotion_check_in_app/utils/constants/text_strings.dart';
 import 'package:emotion_check_in_app/utils/theme/text_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 
@@ -69,6 +72,10 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _checkInButton() {
+    final checkInProvider = context.watch<EmotionCheckInProvider>();
+    final todayCheckIn = checkInProvider.todayCheckIn;
+    final userName = context.watch<AuthProvider>().userName ?? "Guest";
+
     return Container(
       height: 150,
       padding: EdgeInsets.symmetric(horizontal: ESizes.md),
@@ -85,10 +92,19 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       child: Center(
-        child:ElevatedButton(
-          onPressed: (){
-            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => EmotionCheckInScreen()));
-          }, // Disable button if no emotion is selected
+        child: ElevatedButton(
+          onPressed: todayCheckIn != null ? null : (){
+            final now = DateTime.now();
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => EmotionCheckInScreen(
+                  userName: userName,
+                  checkInTime: now,
+                ),
+              ),
+            );
+          },
           style: ElevatedButton.styleFrom(
             backgroundColor: EColors.primary,
             shape: RoundedRectangleBorder(
@@ -111,7 +127,10 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Container _checkInInfoSection() {
+  Widget _checkInInfoSection() {
+    final checkInProvider = context.watch<EmotionCheckInProvider>();
+    final todayCheckIn = checkInProvider.todayCheckIn;
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
@@ -124,49 +143,62 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      child: Row(
+      child: todayCheckIn != null
+          ? Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.only(
-                    top: 10, bottom: 10, right: 10, left: 4),
+                padding: const EdgeInsets.only(top: 10, bottom: 10, right: 10, left: 4),
                 decoration: BoxDecoration(
-                  color: Color(0xFFF7F8F8),
-                  borderRadius:
-                  BorderRadius.circular(12),
+                  color: Color(0xFFF1F1F1),
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                child: Icon(Icons.login, color: Color(0xFFBAD6FE), size: 28,),
+                child: Icon(
+                  Icons.login,
+                  color: EColors.primary,
+                  size: 28,
+                ),
               ),
-              SizedBox(
-                width: 10,
-              ),
+              const SizedBox(width: 10),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    ETexts.CHECK_IN,
+                    "Check-In",
                     style: ETextTheme.lightTextTheme.titleMedium,
                   ),
                   Text(
-                    "${_selectedDay.toLocal()}".split(' ')[0],
+                    DateFormat('MMMM d, yyyy')
+                        .format(todayCheckIn.checkInTime), // Format the date
                     style: ETextTheme.lightTextTheme.labelMedium,
                   ),
                 ],
               ),
             ],
           ),
-          Text(
-            "9:41",
-            style: ETextTheme.lightTextTheme.titleMedium,
-          ),
+          Text('${todayCheckIn.checkInTime.hour}:${todayCheckIn.checkInTime.minute.toString().padLeft(2, '0')}', style: ETextTheme.lightTextTheme.titleMedium,)
         ],
+      )
+          : Center(
+        child: Text(
+          "You have not checked in yet for today.",
+          style: ETextTheme.lightTextTheme.labelMedium,
+        ),
       ),
     );
   }
 
-  Container _calendarSection() {
+  Widget _calendarSection() {
+    final emotionCheckInProvider = context.watch<EmotionCheckInProvider>();
+    final checkInList = emotionCheckInProvider.checkInList;
+
+    Map<DateTime, CheckInType> checkInTypeMap = {
+      for (var checkIn in checkInList)
+        DateTime(checkIn.checkInTime.year, checkIn.checkInTime.month, checkIn.checkInTime.day): checkIn.checkInType,
+    };
+
     return Container(
       decoration: BoxDecoration(
         color: EColors.white,
@@ -179,14 +211,12 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       child: Padding(
-        padding: const EdgeInsets.only(
-            left: ESizes.sm, right: ESizes.sm, bottom: ESizes.sm),
+        padding: const EdgeInsets.all(ESizes.sm),
         child: TableCalendar(
           firstDay: DateTime.utc(2000, 1, 1),
           lastDay: DateTime.utc(2100, 12, 31),
           focusedDay: _focusedDay,
-          calendarFormat: CalendarFormat.month,
-          selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
+          selectedDayPredicate: (day) => isSameDay(day, _selectedDay),
           onDaySelected: (selectedDay, focusedDay) {
             setState(() {
               _selectedDay = selectedDay;
@@ -197,29 +227,92 @@ class _HomeScreenState extends State<HomeScreen> {
             formatButtonVisible: false,
             titleCentered: true,
             titleTextStyle: TextStyle(
-                fontSize: 16, fontWeight: FontWeight.bold, color: EColors.dark),
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: EColors.dark,
+            ),
+            leftChevronIcon: Icon(Icons.chevron_left, color: EColors.dark),
+            rightChevronIcon: Icon(Icons.chevron_right, color: EColors.dark),
           ),
           calendarStyle: CalendarStyle(
-            selectedDecoration: BoxDecoration(
-              color: EColors.lightBlue,
-              shape: BoxShape.circle,
+            defaultTextStyle: const TextStyle(color: EColors.dark), // Normal day text
+            weekendTextStyle: const TextStyle(color: EColors.dark), // Weekend day text
+            outsideTextStyle: const TextStyle(color: EColors.grey), // Outside day text
+            todayDecoration: BoxDecoration(), // No highlight for today
+            selectedDecoration: BoxDecoration(), // No highlight for default selection
+            rangeHighlightColor: Colors.transparent, // No range highlight
+            markerDecoration: BoxDecoration(), // No default markers
+            cellMargin: const EdgeInsets.all(4), // Reduce cell padding for compact look
+          ),
+          availableGestures: AvailableGestures.horizontalSwipe, // Only swipe months
+
+          /// Highlight each day with custom colors
+          calendarBuilders: CalendarBuilders(
+            defaultBuilder: (context, day, focusedDay) {
+              // Always set the day text color to black
+              return Center(
+                child: Text(
+                  '${day.day}',
+                  style: const TextStyle(color: EColors.dark),
+                ),
+              );
+            },
+            selectedBuilder: (context, day, focusedDay) {
+              // Handle selection style based on check-in type
+              final checkInType = checkInTypeMap[DateTime(day.year, day.month, day.day)];
+
+              if (checkInType == CheckInType.onTime) {
+                return _buildHighlightedDay(day, EColors.onTimeColor);
+              } else if (checkInType == CheckInType.late) {
+                return _buildHighlightedDay(day, EColors.lateColor);
+              } else if (day.isAfter(DateTime.now())) {
+                // Upcoming days (not yet reached)
+                return _buildHighlightedDay(day, EColors.lightBlue);
+              } else {
+                // Default highlight for unlisted or past days
+                return _buildHighlightedDay(day, EColors.lightBlue);
+              }
+            },
+            markerBuilder: (context, day, events) {
+              // Highlight the day based on check-in type
+              final checkInType = checkInTypeMap[DateTime(day.year, day.month, day.day)];
+
+              if (checkInType == CheckInType.onTime) {
+                return _buildHighlightedDay(day, EColors.onTimeColor);
+              } else if (checkInType == CheckInType.late) {
+                return _buildHighlightedDay(day, EColors.lateColor);
+              }
+
+              // Default text for days without check-in
+              return Center(
+                child: Text(
+                  '${day.day}',
+                  style: const TextStyle(color: EColors.dark),
+                ),
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHighlightedDay(DateTime day, Color color) {
+    return Center(
+      child: Container(
+        width: 35,
+        height: 35,
+        decoration: BoxDecoration(
+          color: color,
+          shape: BoxShape.circle,
+        ),
+        child: Center(
+          child: Text(
+            '${day.day}',
+            style: const TextStyle(
+              color: EColors.dark,
+              fontWeight: FontWeight.bold,
             ),
-            todayDecoration: BoxDecoration(
-              color: EColors.onTimeColor,
-              shape: BoxShape.circle,
-            ),
-            weekendDecoration: BoxDecoration(
-              color: EColors.lateColor,
-              shape: BoxShape.circle,
-            ),
-            holidayTextStyle: const TextStyle(color: EColors.lateColor),
-            weekendTextStyle: const TextStyle(color: EColors.dark),
-            defaultDecoration: BoxDecoration(
-              color: EColors.onTimeColor,
-              shape: BoxShape.circle,
-            ),
-            defaultTextStyle: const TextStyle(color: EColors.dark),
-            outsideDaysVisible: false,
           ),
         ),
       ),
@@ -281,11 +374,11 @@ class _HomeScreenState extends State<HomeScreen> {
         return AlertDialog(
           backgroundColor: EColors.white,
           title: Text(
-            ETexts.DIALOG_TITLE,
+            ETexts.LOGOUT_TITLE,
             style: ETextTheme.lightTextTheme.headlineMedium,
           ),
           content: Text(
-            ETexts.DIALOG_CONTEXT,
+            ETexts.LOGOUT_CONTENT,
             style: ETextTheme.lightTextTheme.titleSmall,
           ),
           actions: [

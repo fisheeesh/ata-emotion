@@ -1,0 +1,1 @@
+enum Token { authToken, refreshToken, userName }

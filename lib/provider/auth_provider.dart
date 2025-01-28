@@ -9,6 +9,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/io_client.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:http/http.dart' as http;
 
 class AuthProvider extends ChangeNotifier {
   final GoogleSignIn _googleSignIn = GoogleSignIn(
@@ -78,7 +79,7 @@ class AuthProvider extends ChangeNotifier {
         'Token': 'Bearer $accessToken',
       };
 
-      debugPrint("Requesting to URL: ${ETexts.BASE_URL}");
+      debugPrint("Requesting to URL: ${ETexts.AUTHORIZATION_ENDPOINT}");
       debugPrint("Request Headers: $headers");
 
       // Allow self-signed certificates during development
@@ -89,9 +90,11 @@ class AuthProvider extends ChangeNotifier {
 
       /// Set a timeout for the HTTP request
       /// Timeout set to 10 seconds
+      // final res = await http.post(Uri.parse(ETexts.AUTHORIZATION_ENDPOINT),
+      //   headers: headers,).timeout(const Duration(seconds: 30));
       final response = await ioClient
           .post(
-        Uri.parse(ETexts.BASE_URL),
+        Uri.parse(ETexts.AUTHORIZATION_ENDPOINT),
         headers: headers,
       )
           .timeout(const Duration(seconds: 30));

@@ -1,6 +1,6 @@
 class ETexts {
   // Server Base URL
-  static const String BASE_URL = 'https://10.0.2.2:8443/security/auth';
+  static const String AUTHORIZATION_ENDPOINT = 'https://10.0.2.2:8443/security/auth';
 
   // onBoarding Texts
   static const String ONBOARDINGTITLE1 = 'Easy way to confirm your attendance';
@@ -31,8 +31,8 @@ class ETexts {
   static const String DEFAULT_TEXT = "User";
   static const String LOGOUT = "Log Out";
   static const String CHECK_IN = "Check In";
-  static const String DIALOG_TITLE = "Confirm Logout.";
-  static const String DIALOG_CONTEXT = "Are you sure you want to log out?";
+  static const String LOGOUT_TITLE = "Confirm Logout.";
+  static const String LOGOUT_CONTENT = "Are you sure you want to log out?";
   static const String OK = "OK";
   static const String CANCEL = "Cancel";
 
@@ -45,5 +45,9 @@ class ETexts {
   static const String SUCCESS_MSG = "Check In Success!";
   static const String TIME = "Time";
   static const String HOME = "Home";
+
+  // leave confirm dialog
+  static const String LEAVE_TITLE = "Are you sure you want to leave?";
+  static const String LEAVE_CONTENT = "If you leave right now, your check-in time will be reset.";
 }
 

@@ -7,7 +7,20 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class CheckInSuccessScreen extends StatelessWidget {
-  const CheckInSuccessScreen({Key? key}) : super(key: key);
+  final String userName;
+  final DateTime checkInTime;
+  final String emoji;
+  final String label;
+  final String feeling;
+
+  const CheckInSuccessScreen({
+    Key? key,
+    required this.userName,
+    required this.checkInTime,
+    required this.emoji,
+    required this.label,
+    required this.feeling,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -60,7 +73,7 @@ class CheckInSuccessScreen extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           Text(
-            "09 : 41",
+            "${checkInTime.hour}:${checkInTime.minute.toString().padLeft(2, '0')}",
             style: ETextTheme.lightTextTheme.headlineMedium,
           ),
           const SizedBox(height: 20),
@@ -68,20 +81,20 @@ class CheckInSuccessScreen extends StatelessWidget {
           // Emoji and Emotion Text
           Column(
             children: [
-              const Text(
-                "😩",
+              Text(
+                emoji,
                 style: TextStyle(fontSize: 40),
               ),
               const SizedBox(height: 8),
               Text(
-                "stressed",
+                label,
                 style: ETextTheme.lightTextTheme.labelLarge,
               ),
               const SizedBox(height: 20),
 
               // Description Text
               Text(
-                "Unfinished house chores and my boss is\nkeep asking me to do a lot of works.",
+                feeling.isNotEmpty ? feeling : 'No text provided',
                 textAlign: TextAlign.center,
                 style: ETextTheme.lightTextTheme.titleSmall,
               ),

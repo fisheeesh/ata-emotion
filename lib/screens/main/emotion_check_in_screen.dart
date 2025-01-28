@@ -1,3 +1,4 @@
+import 'package:emotion_check_in_app/provider/emotion_check_in_provider.dart';
 import 'package:emotion_check_in_app/screens/main/check_in_success_screen.dart';
 import 'package:emotion_check_in_app/screens/main/home_screen.dart';
 import 'package:emotion_check_in_app/utils/constants/colors.dart';
@@ -6,9 +7,17 @@ import 'package:emotion_check_in_app/utils/constants/text_strings.dart';
 import 'package:emotion_check_in_app/utils/theme/text_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
 class EmotionCheckInScreen extends StatefulWidget {
-  const EmotionCheckInScreen({Key? key}) : super(key: key);
+  final String userName;
+  final DateTime checkInTime;
+
+  const EmotionCheckInScreen({
+    Key? key,
+    required this.userName,
+    required this.checkInTime,
+  }) : super(key: key);
 
   @override
   State<EmotionCheckInScreen> createState() => _EmotionCheckInScreenState();
@@ -17,13 +26,14 @@ class EmotionCheckInScreen extends StatefulWidget {
 class _EmotionCheckInScreenState extends State<EmotionCheckInScreen> {
   int _selectedTabIndex =
       0; // Tracks the selected tab (0: Negative, 1: Neutral, 2: Positive)
-  String?
-      _selectedEmotion; // Tracks the selected emotion (only one can be selected)
+  String? _selectedEmotion; // Tracks the selected emotion (only one can be selected)
+  String? _selectedLabel;
+  final TextEditingController _feelingController = TextEditingController();
 
   // List of emotions for each tab
   final Map<int, List<Map<String, dynamic>>> _emotions = {
     0: [
-      {'icon': '😴', 'label': 'tired'},
+      {'icon': '😓', 'label': 'tired'},
       {'icon': '😩', 'label': 'stressed'},
       {'icon': '😴', 'label': 'bored'},
       {'icon': '😡', 'label': 'frustrated'},
@@ -60,6 +70,7 @@ class _EmotionCheckInScreenState extends State<EmotionCheckInScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // resizeToAvoidBottomInset: false,
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.only(
@@ -69,7 +80,7 @@ class _EmotionCheckInScreenState extends State<EmotionCheckInScreen> {
             children: [
               _headerSection(context),
               const SizedBox(height: 20),
-        
+
               // Container for Tab Bar and Emoji Grid
               Container(
                 padding: const EdgeInsets.all(24),
@@ -93,9 +104,9 @@ class _EmotionCheckInScreenState extends State<EmotionCheckInScreen> {
                   ],
                 ),
               ),
-        
+
               const SizedBox(height: 15),
-        
+
               // Text Field Container
               Container(
                 padding: const EdgeInsets.all(16),
@@ -111,6 +122,7 @@ class _EmotionCheckInScreenState extends State<EmotionCheckInScreen> {
                   ],
                 ),
                 child: TextField(
+                  controller: _feelingController,
                   cursorColor: EColors.grey,
                   maxLines: 3,
                   decoration: InputDecoration(
@@ -119,18 +131,20 @@ class _EmotionCheckInScreenState extends State<EmotionCheckInScreen> {
                     // Border when the field is focused
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(ESizes.roundedXs),
-                      borderSide: BorderSide(color: EColors.lightBlue, width: 2),
+                      borderSide:
+                          BorderSide(color: EColors.lightBlue, width: 2),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(ESizes.roundedXs),
-                      borderSide: BorderSide(color: EColors.lightBlue, width: 2),
+                      borderSide:
+                          BorderSide(color: EColors.lightBlue, width: 2),
                     ),
                   ),
                 ),
               ),
-        
+
               const SizedBox(height: 15),
-        
+
               _submitButton(),
               const SizedBox(height: 15),
             ],
@@ -160,11 +174,31 @@ class _EmotionCheckInScreenState extends State<EmotionCheckInScreen> {
         child: ElevatedButton(
           onPressed: _selectedEmotion != null
               ? () {
-                  debugPrint("Selected Emotion: $_selectedEmotion");
-                  // Handle Submit Logic
-                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => CheckInSuccessScreen()));
+                  context.read<EmotionCheckInProvider>().addCheckIn(
+                        widget.userName,
+                        widget.checkInTime,
+                        _selectedEmotion!,
+                        _selectedLabel!,
+                        _feelingController.text,
+                      );
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => CheckInSuccessScreen(
+                        userName: widget.userName,
+                        checkInTime: widget.checkInTime,
+                        emoji: _selectedEmotion!,
+                        label: _selectedLabel!,
+                        feeling: _feelingController.text,
+                      ),
+                    ),
+                  );
+                  debugPrint('userName: ${widget.userName}');
+                  debugPrint('time: ${widget.checkInTime}');
+                  debugPrint('emoji: $_selectedEmotion');
+                  debugPrint('label: $_selectedLabel');
                 }
-              : null, // Disable button if no emotion is selected
+              : null,
           style: ElevatedButton.styleFrom(
             backgroundColor: EColors.primary,
             shape: RoundedRectangleBorder(
@@ -192,7 +226,8 @@ class _EmotionCheckInScreenState extends State<EmotionCheckInScreen> {
       children: [
         GestureDetector(
           onTap: () {
-            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomeScreen()));
+            Navigator.pushReplacement(
+                context, MaterialPageRoute(builder: (context) => HomeScreen()));
           },
           child: const Icon(Icons.arrow_back_ios),
         ),
@@ -260,12 +295,13 @@ class _EmotionCheckInScreenState extends State<EmotionCheckInScreen> {
       itemCount: emotions.length,
       itemBuilder: (context, index) {
         final emotion = emotions[index];
-        final isSelected = _selectedEmotion == emotion['label'];
+        final isSelected = _selectedEmotion == emotion['icon'];
 
         return GestureDetector(
           onTap: () {
             setState(() {
-              _selectedEmotion = emotion['label']; // Select emotion
+              _selectedLabel = emotion['label'];
+              _selectedEmotion = emotion['icon']; // Select emotion
             });
           },
           child: Container(
