@@ -129,7 +129,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _checkInInfoSection() {
     final checkInProvider = context.watch<EmotionCheckInProvider>();
-    final todayCheckIn = checkInProvider.todayCheckIn;
+    final selectedDayCheckIn = checkInProvider.getCheckInByDate(_selectedDay);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -143,7 +143,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      child: todayCheckIn != null
+      child: selectedDayCheckIn != null
           ? Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -152,7 +152,7 @@ class _HomeScreenState extends State<HomeScreen> {
               Container(
                 padding: const EdgeInsets.only(top: 10, bottom: 10, right: 10, left: 4),
                 decoration: BoxDecoration(
-                  color: Color(0xFFF1F1F1),
+                  color: const Color(0xFFF1F1F1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
@@ -171,20 +171,23 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   Text(
                     DateFormat('MMMM d, yyyy')
-                        .format(todayCheckIn.checkInTime), // Format the date
+                        .format(selectedDayCheckIn.checkInTime), // Display selected date
                     style: ETextTheme.lightTextTheme.labelMedium,
                   ),
                 ],
               ),
             ],
           ),
-          Text('${todayCheckIn.checkInTime.hour}:${todayCheckIn.checkInTime.minute.toString().padLeft(2, '0')}', style: ETextTheme.lightTextTheme.titleMedium,)
+          Text(
+            '${selectedDayCheckIn.checkInTime.hour}:${selectedDayCheckIn.checkInTime.minute.toString().padLeft(2, '0')}',
+            style: ETextTheme.lightTextTheme.titleMedium,
+          ),
         ],
       )
           : Center(
         child: Text(
-          "You have not checked in yet for today.",
-          style: ETextTheme.lightTextTheme.labelMedium,
+          "You have not checked in on this day.",
+          style: ETextTheme.lightTextTheme.labelLarge,
         ),
       ),
     );
@@ -235,9 +238,8 @@ class _HomeScreenState extends State<HomeScreen> {
             rightChevronIcon: Icon(Icons.chevron_right, color: EColors.dark),
           ),
           calendarStyle: CalendarStyle(
-            defaultTextStyle: const TextStyle(color: EColors.dark), // Normal day text
-            weekendTextStyle: const TextStyle(color: EColors.dark), // Weekend day text
-            outsideTextStyle: const TextStyle(color: EColors.grey), // Outside day text
+            // defaultTextStyle: const TextStyle(color: EColors.dark), // Normal day text
+            // weekendTextStyle: const TextStyle(color: EColors.dark), // Weekend day text
             todayDecoration: BoxDecoration(), // No highlight for today
             selectedDecoration: BoxDecoration(), // No highlight for default selection
             rangeHighlightColor: Colors.transparent, // No range highlight
