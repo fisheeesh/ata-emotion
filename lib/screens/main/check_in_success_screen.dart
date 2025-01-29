@@ -1,10 +1,11 @@
+import 'package:emotion_check_in_app/components/buttons/custom_elevated_button.dart';
 import 'package:emotion_check_in_app/screens/main/home_screen.dart';
 import 'package:emotion_check_in_app/utils/constants/colors.dart';
 import 'package:emotion_check_in_app/utils/constants/sizes.dart';
 import 'package:emotion_check_in_app/utils/constants/text_strings.dart';
+import 'package:emotion_check_in_app/utils/helpers/helper_functions.dart';
 import 'package:emotion_check_in_app/utils/theme/text_theme.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class CheckInSuccessScreen extends StatelessWidget {
   final String userName;
@@ -32,16 +33,19 @@ class CheckInSuccessScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            // Checkmark Icon
+            /// Checkmark Icon
             _successIcon(),
             const SizedBox(height: 20),
-            // Success Text
+
+            /// Success Message
             _successMsg(),
             const SizedBox(height: 40),
-            // White Card
+
+            /// User check-in info
             _checkInInfoCard(),
             const SizedBox(height: 40),
-            // Home Button
+
+            /// Back to Home Button
             _backToHomButton(context)
           ],
         ),
@@ -52,13 +56,13 @@ class CheckInSuccessScreen extends StatelessWidget {
   Container _checkInInfoCard() {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(ESizes.md),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        color: EColors.white,
+        borderRadius: BorderRadius.circular(ESizes.roundedSm),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: EColors.black.withOpacity(0.1),
             blurRadius: 10,
             offset: const Offset(0, 5),
           ),
@@ -78,7 +82,7 @@ class CheckInSuccessScreen extends StatelessWidget {
           ),
           const SizedBox(height: 20),
 
-          // Emoji and Emotion Text
+          /// Emoji and Emotion Text
           Column(
             children: [
               Text(
@@ -92,7 +96,7 @@ class CheckInSuccessScreen extends StatelessWidget {
               ),
               const SizedBox(height: 20),
 
-              // Description Text
+              /// Feeling Text
               Text(
                 feeling.isNotEmpty ? feeling : 'No text provided',
                 textAlign: TextAlign.center,
@@ -121,7 +125,7 @@ class CheckInSuccessScreen extends StatelessWidget {
         shape: BoxShape.circle,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: EColors.black.withOpacity(0.1),
             blurRadius: 10,
             offset: const Offset(0, 5),
           ),
@@ -137,7 +141,7 @@ class CheckInSuccessScreen extends StatelessWidget {
           ),
           child: const Icon(
             Icons.check,
-            size: 30,
+            size: ESizes.iconXl,
             color: Colors.white,
           ),
         ),
@@ -146,45 +150,10 @@ class CheckInSuccessScreen extends StatelessWidget {
   }
 
   Widget _backToHomButton(BuildContext context) {
-    return Container(
-      height: 150,
-      padding: EdgeInsets.symmetric(horizontal: ESizes.md),
-      decoration: BoxDecoration(
-        color: EColors.secondary,
-        border: Border.all(color: EColors.white),
-        borderRadius: BorderRadius.circular(18),
-        boxShadow: [
-          BoxShadow(
-              color: const Color(0xFFB4D2F1),
-              blurRadius: 10,
-              spreadRadius: 2,
-              offset: const Offset(0, 0)),
-        ],
-      ),
-      child: Center(
-        child: ElevatedButton(
-          onPressed: () {
-            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomeScreen()));
-          }, // Disable button if no emotion is selected
-          style: ElevatedButton.styleFrom(
-            backgroundColor: EColors.primary,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(ESizes.roundedLg),
-            ),
-            minimumSize: const Size.fromHeight(100),
-          ),
-          child: Text(
-            ETexts.HOME,
-            style: GoogleFonts.lexend(
-              textStyle: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.w600,
-                color: EColors.white,
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
+    return CustomElevatedButton(
+        onPressed: () {
+          EHelperFunctions.navigateToScreen(context, HomeScreen());
+        },
+        placeholder: ETexts.HOME);
   }
 }

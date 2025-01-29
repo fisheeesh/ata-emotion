@@ -29,7 +29,7 @@ class CustomButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(ESizes.roundedXs),
           ),
         ),
-        // Let us design as we want
+        /// Let us design as we want
         child: child,
       ),
     );

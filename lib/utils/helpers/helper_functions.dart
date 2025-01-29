@@ -1,6 +1,6 @@
+import 'package:emotion_check_in_app/utils/constants/text_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:get/get.dart';
 
 class EHelperFunctions {
   static void showSnackBar(BuildContext context, String message) {
@@ -9,9 +9,9 @@ class EHelperFunctions {
     );
   }
 
-  static void showAlert(String title, String message) {
+  static void showAlert(BuildContext context, String title, String message) {
     showDialog(
-        context: Get.context!,
+        context: context,
         builder: (BuildContext context) {
           return AlertDialog(
             title: Text(title),
@@ -21,17 +21,15 @@ class EHelperFunctions {
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
-                  child: Text('OK'))
+                  child: Text(ETexts.OK))
             ],
           );
         });
   }
 
-  static void navigateToScreen(BuildContext context, Widget screen){
+  static void navigateToScreen(BuildContext context, Widget screen) {
     Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-            builder: (builder) => screen));
+        context, MaterialPageRoute(builder: (builder) => screen));
   }
 
   static String truncateText(String text, int maxLength) {
@@ -41,8 +39,7 @@ class EHelperFunctions {
     return text;
   }
 
-  static String getFormattedDate(DateTime date,
-      {String format = 'dd/MM/yyyy'}) {
+  static String getFormattedDate(DateTime date, String format) {
     return DateFormat(format).format(date);
   }
 }

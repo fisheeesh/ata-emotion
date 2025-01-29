@@ -1,6 +1,14 @@
 class ETexts {
-  // Server Base URL
-  static const String AUTHORIZATION_ENDPOINT = 'https://10.0.2.2:8443/security/auth';
+  // server URL
+  static const String AUTHORIZATION_ENDPOINT =
+      'https://10.0.2.2:8443/security/auth';
+
+  // snack-bar text
+  static const String COMMON_ERROR =
+      "Something went wrong!. Please try again later.";
+  static const String REQ_TIME_OUT =
+      "Request timed out. Please try again later.";
+  static const String LOGOUT_SUCCESS = "Logout Successfully.";
 
   // onBoarding Texts
   static const String ONBOARDINGTITLE1 = 'Easy way to confirm your attendance';
@@ -35,6 +43,7 @@ class ETexts {
   static const String LOGOUT_CONTENT = "Are you sure you want to log out?";
   static const String OK = "OK";
   static const String CANCEL = "Cancel";
+  static const String NO_CHECK_IN = "You have not checked in on this day.";
 
   // check-in submission screen
   static const String QUES = "How do you feel today?";
@@ -48,6 +57,6 @@ class ETexts {
 
   // leave confirm dialog
   static const String LEAVE_TITLE = "Are you sure you want to leave?";
-  static const String LEAVE_CONTENT = "If you leave right now, your check-in time will be reset.";
+  static const String LEAVE_CONTENT =
+      "If you leave right now, your check-in time will be reset.";
 }
-

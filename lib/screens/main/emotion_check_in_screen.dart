@@ -1,12 +1,13 @@
+import 'package:emotion_check_in_app/components/buttons/custom_elevated_button.dart';
 import 'package:emotion_check_in_app/provider/emotion_check_in_provider.dart';
 import 'package:emotion_check_in_app/screens/main/check_in_success_screen.dart';
 import 'package:emotion_check_in_app/screens/main/home_screen.dart';
 import 'package:emotion_check_in_app/utils/constants/colors.dart';
 import 'package:emotion_check_in_app/utils/constants/sizes.dart';
 import 'package:emotion_check_in_app/utils/constants/text_strings.dart';
+import 'package:emotion_check_in_app/utils/helpers/helper_functions.dart';
 import 'package:emotion_check_in_app/utils/theme/text_theme.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 class EmotionCheckInScreen extends StatefulWidget {
@@ -24,13 +25,16 @@ class EmotionCheckInScreen extends StatefulWidget {
 }
 
 class _EmotionCheckInScreenState extends State<EmotionCheckInScreen> {
-  int _selectedTabIndex =
-      0; // Tracks the selected tab (0: Negative, 1: Neutral, 2: Positive)
-  String? _selectedEmotion; // Tracks the selected emotion (only one can be selected)
+  /// Tracks the selected tab (0: Negative, 1: Neutral, 2: Positive)
+  int _selectedTabIndex = 0;
+
+  /// Tracks the selected emotion (only one can be selected)
+  String? _selectedEmotion;
+
   String? _selectedLabel;
   final TextEditingController _feelingController = TextEditingController();
 
-  // List of emotions for each tab
+  /// List of emotions for each tab
   final Map<int, List<Map<String, dynamic>>> _emotions = {
     0: [
       {'icon': '😓', 'label': 'tired'},
@@ -78,18 +82,19 @@ class _EmotionCheckInScreenState extends State<EmotionCheckInScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              /// header section
               _headerSection(context),
               const SizedBox(height: 20),
 
-              // Container for Tab Bar and Emoji Grid
+              /// Tab Bar and Emoji Grid
               Container(
-                padding: const EdgeInsets.all(24),
+                padding: const EdgeInsets.all(ESizes.md),
                 decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
+                  color: EColors.white,
+                  borderRadius: BorderRadius.circular(ESizes.roundedSm),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.grey.withOpacity(0.2),
+                      color: EColors.grey.withOpacity(0.2),
                       blurRadius: 10,
                       offset: const Offset(0, 5),
                     ),
@@ -104,18 +109,17 @@ class _EmotionCheckInScreenState extends State<EmotionCheckInScreen> {
                   ],
                 ),
               ),
-
               const SizedBox(height: 15),
 
-              // Text Field Container
+              /// Feeling Text Field
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(ESizes.roundedSm),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.grey.withOpacity(0.2),
+                      color: EColors.grey.withOpacity(0.2),
                       blurRadius: 10,
                       offset: const Offset(0, 5),
                     ),
@@ -142,9 +146,9 @@ class _EmotionCheckInScreenState extends State<EmotionCheckInScreen> {
                   ),
                 ),
               ),
-
               const SizedBox(height: 15),
 
+              /// submit button
               _submitButton(),
               const SizedBox(height: 15),
             ],
@@ -155,70 +159,32 @@ class _EmotionCheckInScreenState extends State<EmotionCheckInScreen> {
   }
 
   Widget _submitButton() {
-    return Container(
-      height: 150,
-      padding: EdgeInsets.symmetric(horizontal: ESizes.md),
-      decoration: BoxDecoration(
-        color: EColors.secondary,
-        border: Border.all(color: EColors.white),
-        borderRadius: BorderRadius.circular(18),
-        boxShadow: [
-          BoxShadow(
-              color: const Color(0xFFB4D2F1),
-              blurRadius: 10,
-              spreadRadius: 2,
-              offset: const Offset(0, 0)),
-        ],
-      ),
-      child: Center(
-        child: ElevatedButton(
-          onPressed: _selectedEmotion != null
-              ? () {
-                  context.read<EmotionCheckInProvider>().addCheckIn(
-                        widget.userName,
-                        widget.checkInTime,
-                        _selectedEmotion!,
-                        _selectedLabel!,
-                        _feelingController.text,
-                      );
-                  Navigator.pushReplacement(
+    return CustomElevatedButton(
+        onPressed: _selectedEmotion != null
+            ? () {
+                context.read<EmotionCheckInProvider>().addCheckIn(
+                      widget.userName,
+                      widget.checkInTime,
+                      _selectedEmotion!,
+                      _selectedLabel!,
+                      _feelingController.text,
+                    );
+                EHelperFunctions.navigateToScreen(
                     context,
-                    MaterialPageRoute(
-                      builder: (context) => CheckInSuccessScreen(
-                        userName: widget.userName,
-                        checkInTime: widget.checkInTime,
-                        emoji: _selectedEmotion!,
-                        label: _selectedLabel!,
-                        feeling: _feelingController.text,
-                      ),
-                    ),
-                  );
-                  debugPrint('userName: ${widget.userName}');
-                  debugPrint('time: ${widget.checkInTime}');
-                  debugPrint('emoji: $_selectedEmotion');
-                  debugPrint('label: $_selectedLabel');
-                }
-              : null,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: EColors.primary,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(ESizes.roundedLg),
-            ),
-            minimumSize: const Size.fromHeight(100),
-          ),
-          child: Text(
-            ETexts.SUBMIT,
-            style: GoogleFonts.lexend(
-              textStyle: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.w600,
-                color: EColors.white,
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
+                    CheckInSuccessScreen(
+                      userName: widget.userName,
+                      checkInTime: widget.checkInTime,
+                      emoji: _selectedEmotion!,
+                      label: _selectedLabel!,
+                      feeling: _feelingController.text,
+                    ));
+                debugPrint('userName: ${widget.userName}');
+                debugPrint('time: ${widget.checkInTime}');
+                debugPrint('emoji: $_selectedEmotion');
+                debugPrint('label: $_selectedLabel');
+              }
+            : null,
+        placeholder: ETexts.SUBMIT);
   }
 
   Row _headerSection(BuildContext context) {
@@ -258,7 +224,9 @@ class _EmotionCheckInScreenState extends State<EmotionCheckInScreen> {
       onTap: () {
         setState(() {
           _selectedTabIndex = index;
-          _selectedEmotion = null; // Reset selection when switching tabs
+
+          /// Reset selection when switching tabs
+          _selectedEmotion = null;
         });
       },
       child: Container(
@@ -271,8 +239,10 @@ class _EmotionCheckInScreenState extends State<EmotionCheckInScreen> {
         ),
         child: Text(
           label,
+
+          /// @TODO: Apply Google Font
           style: TextStyle(
-            color: isSelected ? Colors.white : Colors.blue,
+            color: isSelected ? EColors.white : EColors.primary,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -306,7 +276,7 @@ class _EmotionCheckInScreenState extends State<EmotionCheckInScreen> {
           },
           child: Container(
             decoration: BoxDecoration(
-              color: isSelected ? Colors.blue.shade100 : Colors.white,
+              color: isSelected ? Colors.blue.shade100 : EColors.white,
               borderRadius: BorderRadius.circular(10),
               border: Border.all(
                 color: isSelected ? EColors.primary : Colors.grey.shade300,

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:emotion_check_in_app/enums/tokens.dart';
 import 'package:emotion_check_in_app/screens/auth/login_screen.dart';
 import 'package:emotion_check_in_app/screens/main/home_screen.dart';
 import 'package:emotion_check_in_app/utils/constants/text_strings.dart';
@@ -47,7 +48,7 @@ class AuthProvider extends ChangeNotifier {
       notifyListeners();
 
       /// Store the user's name securely for future use
-      await _storage.write(key: 'user_name', value: _userName);
+      await _storage.write(key: ETokens.userName.name, value: _userName);
 
       final auth = await _user!.authentication;
       final accessToken = auth.accessToken;
@@ -59,19 +60,20 @@ class AuthProvider extends ChangeNotifier {
 
       final isAuthorized = await _sendAccessTokenToServer(accessToken, context);
 
+      /// Navigate to HomeScreen after successful login and server authorization
       if (isAuthorized) {
         EHelperFunctions.navigateToScreen(context, HomeScreen());
       }
     } catch (e) {
       debugPrint("Google Login Error: $e");
+      EHelperFunctions.showSnackBar(context, ETexts.COMMON_ERROR);
     } finally {
       _isLoading = false;
       notifyListeners();
     }
   }
 
-  /// Sends access token to the backend server
-  /// Sends access token to the backend server with a timeout
+  /// Sends access token to the backend server for authorization
   Future<bool> _sendAccessTokenToServer(String accessToken, BuildContext context) async {
     try {
       final headers = {
@@ -82,22 +84,22 @@ class AuthProvider extends ChangeNotifier {
       debugPrint("Requesting to URL: ${ETexts.AUTHORIZATION_ENDPOINT}");
       debugPrint("Request Headers: $headers");
 
-      // Allow self-signed certificates during development
+      /// Allow self-signed certificates during development (ONLY FOR DEVELOPMENT)
+      // @TODO: We will implement with another way in production
       HttpClient httpClient = HttpClient()
         ..badCertificateCallback =
             (X509Certificate cert, String host, int port) => true;
       IOClient ioClient = IOClient(httpClient);
 
-      /// Set a timeout for the HTTP request
-      /// Timeout set to 10 seconds
+      /// Handles cases like server errors, crashes.
+      /// Uses a timeout to avoid indefinite waiting for the server response.
       // final res = await http.post(Uri.parse(ETexts.AUTHORIZATION_ENDPOINT),
       //   headers: headers,).timeout(const Duration(seconds: 30));
       final response = await ioClient
           .post(
         Uri.parse(ETexts.AUTHORIZATION_ENDPOINT),
         headers: headers,
-      )
-          .timeout(const Duration(seconds: 30));
+      ).timeout(const Duration(seconds: 30));
 
       debugPrint('Response: ${response.body}');
 
@@ -108,7 +110,7 @@ class AuthProvider extends ChangeNotifier {
         if (authToken != null && refreshToken != null) {
           await saveTokens(authToken, refreshToken);
 
-          // Decode and store the email
+          /// Decode and store the email
           _decodeEmailFromToken(authToken);
           debugPrint("Tokens saved successfully.");
         }
@@ -122,7 +124,7 @@ class AuthProvider extends ChangeNotifier {
       debugPrint("Request Timeout: The server took too long to respond.");
       EHelperFunctions.showSnackBar(
         context,
-        "Request timed out. Please try again later.",
+        ETexts.REQ_TIME_OUT,
       );
       return false;
     } catch (e) {
@@ -142,7 +144,7 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  /// Logs out the user and clears tokens
+  /// Logs out the user and clears all tokens
   Future<void> logout(BuildContext context) async {
     try {
       await _googleSignIn.disconnect();
@@ -151,21 +153,22 @@ class AuthProvider extends ChangeNotifier {
       await clearTokens();
       notifyListeners();
       EHelperFunctions.navigateToScreen(context, LoginScreen());
-      EHelperFunctions.showSnackBar(context, 'Logout Successfully.');
+      EHelperFunctions.showSnackBar(context, ETexts.LOGOUT_SUCCESS);
     } catch (e) {
       debugPrint("Logout Error: $e");
     }
   }
+
   /// Restore user name from Secure Storage
   Future<void> restoreUserName() async {
-    _userName = await _storage.read(key: 'user_name');
+    _userName = await _storage.read(key: ETokens.userName.name);
     notifyListeners();
   }
 
-  /// Save tokens securely in FlutterSecureStorage
+  /// Save tokens securely in Secure Storage
   Future<void> saveTokens(String authToken, String refreshToken) async {
-    await _storage.write(key: 'auth_token', value: authToken);
-    await _storage.write(key: 'refresh_token', value: refreshToken);
+    await _storage.write(key: ETokens.authToken.name, value: authToken);
+    await _storage.write(key: ETokens.refreshToken.name, value: refreshToken);
   }
 
   /// Clears all tokens from storage
@@ -173,9 +176,9 @@ class AuthProvider extends ChangeNotifier {
     await _storage.deleteAll();
   }
 
-  /// Restore email from stored token
+  /// Restore email from stored token every time user log in
   Future<void> restoreUserEmail() async {
-    final authToken = await _storage.read(key: 'auth_token');
+    final authToken = await _storage.read(key: ETokens.refreshToken.name);
     if (authToken != null && isTokenValid(authToken)) {
       _decodeEmailFromToken(authToken);
     }

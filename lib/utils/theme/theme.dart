@@ -4,7 +4,7 @@ import 'package:emotion_check_in_app/utils/theme/text_theme.dart';
 import 'package:flutter/material.dart';
 
 class EAppTheme {
-  // To keep the class constructor private
+  /// To keep the class constructor private
   EAppTheme._();
 
   static ThemeData lightTheme = ThemeData(

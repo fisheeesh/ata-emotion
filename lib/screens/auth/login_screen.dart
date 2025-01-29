@@ -41,7 +41,7 @@ class _LoginScreenState extends State<LoginScreen> {
     _passwordController.dispose();
   }
 
-  void initSharePref () async{
+  void initSharePref() async {
     prefs = await SharedPreferences.getInstance();
   }
 
@@ -77,6 +77,7 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: ESizes.md),
                 width: double.infinity,
+
                 /// Form
                 child: Form(
                   key: _formKey,
@@ -88,6 +89,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         /// ATA Logo
                         _logoSection(),
                         const SizedBox(height: 70),
+
                         /// Form Title
                         _formTitleSection(),
                         const SizedBox(height: 15),
@@ -144,100 +146,101 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  CustomOutlinedButton _googleLoginButton(bool isGoogleLoading, BuildContext context) {
+  CustomOutlinedButton _googleLoginButton(
+      bool isGoogleLoading, BuildContext context) {
     return CustomOutlinedButton(
-                        width: double.infinity,
-                        height: 55,
-                        borderColor: EColors.primary,
-                        onPressed: isGoogleLoading ? null : () async {
-                          await context.read<AuthProvider>().loginAndAuthorize(context);
-                        },
-                        child: isGoogleLoading
-                            ? const SizedBox(
-                          width: ESizes.wXs,
-                          height: ESizes.hXs,
-                          child: CircularProgressIndicator(
-                            color: EColors.primary,
-                            strokeWidth: 2.0,
-                          ),
-                        )
-                            : Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Image.asset(
-                              EImages.googleLogo,
-                              height: ESizes.hXs,
-                            ),
-                            const SizedBox(width: 10),
-                            Text(
-                              ETexts.GOOGLE,
-                              style:
-                              ETextTheme.lightTextTheme.titleMedium,
-                            ),
-                          ],
-                        ),
-                      );
+      width: double.infinity,
+      height: 55,
+      borderColor: EColors.primary,
+      onPressed: isGoogleLoading
+          ? null
+          : () async {
+              await context.read<AuthProvider>().loginAndAuthorize(context);
+            },
+      child: isGoogleLoading
+          ? const SizedBox(
+              width: ESizes.wXs,
+              height: ESizes.hXs,
+              child: CircularProgressIndicator(
+                color: EColors.primary,
+                strokeWidth: 2.0,
+              ),
+            )
+          : Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Image.asset(
+                  EImages.googleLogo,
+                  height: ESizes.hXs,
+                ),
+                const SizedBox(width: 10),
+                Text(
+                  ETexts.GOOGLE,
+                  style: ETextTheme.lightTextTheme.titleMedium,
+                ),
+              ],
+            ),
+    );
   }
 
   CustomButton _loginButton() {
     return CustomButton(
-                        width: ESizes.wFull,
-                        height: ESizes.hNormal,
-                        onPressed: _isLoading ? null : _handleLogin,
-                        child: _isLoading
-                            ? Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const SizedBox(
-                              width: ESizes.wXs,
-                              height: ESizes.hXs,
-                              child: CircularProgressIndicator(
-                                color: EColors.white,
-                                strokeWidth: 2.0,
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            Text(
-                              ETexts.PROCESSING,
-                              style:
-                              ETextTheme.lightTextTheme.titleLarge,
-                            ),
-                          ],
-                        )
-                            : Text(
-                          ETexts.LOGIN,
-                          style: ETextTheme.lightTextTheme.titleLarge,
-                        ),
-                      );
+      width: ESizes.wFull,
+      height: ESizes.hNormal,
+      onPressed: _isLoading ? null : _handleLogin,
+      child: _isLoading
+          ? Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const SizedBox(
+                  width: ESizes.wXs,
+                  height: ESizes.hXs,
+                  child: CircularProgressIndicator(
+                    color: EColors.white,
+                    strokeWidth: 2.0,
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Text(
+                  ETexts.PROCESSING,
+                  style: ETextTheme.lightTextTheme.titleLarge,
+                ),
+              ],
+            )
+          : Text(
+              ETexts.LOGIN,
+              style: ETextTheme.lightTextTheme.titleLarge,
+            ),
+    );
   }
 
   Align _forgotPasswordSection() {
     return Align(
-                        alignment: Alignment.centerRight,
-                        child: TextButton(
-                          onPressed: () {
-                            // Handle forgot password logic
-                          },
-                          child: const Text(
-                            ETexts.FORGOTPW,
-                            style: TextStyle(color: EColors.grey),
-                          ),
-                        ),
-                      );
+      alignment: Alignment.centerRight,
+      child: TextButton(
+        onPressed: () {
+          // Handle forgot password logic
+        },
+        child: const Text(
+          ETexts.FORGOTPW,
+          style: TextStyle(color: EColors.grey),
+        ),
+      ),
+    );
   }
 
   Text _formTitleSection() {
     return Text(
-                        ETexts.LOGINPAGETITLE,
-                        textAlign: TextAlign.start,
-                        style: ETextTheme.lightTextTheme.titleMedium,
-                      );
+      ETexts.LOGINPAGETITLE,
+      textAlign: TextAlign.start,
+      style: ETextTheme.lightTextTheme.titleMedium,
+    );
   }
 
   Image _logoSection() {
     return Image.asset(
-                            EImages.ataLogo,
-                            height: ESizes.hNormal,
-                          );
+      EImages.ataLogo,
+      height: ESizes.hNormal,
+    );
   }
 }

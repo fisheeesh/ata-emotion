@@ -13,6 +13,7 @@ class ESizes {
   static const double iconSm = 16.0;
   static const double iconMd = 18.0;
   static const double iconLg = 24.0;
+  static const double iconXl = 30;
 
   // Width & Height
   static const double wFull = double.infinity;

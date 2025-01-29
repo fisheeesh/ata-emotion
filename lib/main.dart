@@ -1,3 +1,4 @@
+import 'package:emotion_check_in_app/enums/tokens.dart';
 import 'package:emotion_check_in_app/provider/auth_provider.dart';
 import 'package:emotion_check_in_app/provider/emotion_check_in_provider.dart';
 import 'package:emotion_check_in_app/screens/auth/login_screen.dart';
@@ -23,7 +24,7 @@ void main() async {
   final authProvider = AuthProvider();
 
   /// Fetch the refresh token and restore the user's name
-  token = await storage.read(key: 'refresh_token');
+  token = await storage.read(key: ETokens.refreshToken.name);
   if (token != null && authProvider.isTokenValid(token)) {
     await authProvider.restoreUserName();
     debugPrint('Token is not expired yet 😉.');
